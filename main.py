@@ -58,8 +58,9 @@ if __name__ == '__main__':
     while(True):
         #posicionando cursor da tela sempre no mesmo lugar
         WConio2.gotoxy(0,0)
+        if relogio % 500 == 0 and bichoI < 19: 
+            bichoI += 1
         
-
         #limpando a matriz antes de desenhar nela
         limparTela(matriz)
 
@@ -80,7 +81,7 @@ if __name__ == '__main__':
                 aviaoJ -= 1
             elif symbol == 'd':
                 aviaoJ += 1
-            elif symbol =='w':
-                aviaoI -= 1
-            elif symbol =="s":
-                aviaoI += 1
+            elif symbol == 'w':
+                bichoI -= 1
+            elif symbol == 's':
+                bichoI += 1 
