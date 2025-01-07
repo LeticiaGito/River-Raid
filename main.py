@@ -71,7 +71,7 @@ if __name__ == '__main__':
         delimitacao(matriz)
 
         #atualizando relogio do jogo
-        #relogio += 1
+        relogio += 1
 
         #controlando personages
         if WConio2.kbhit():
