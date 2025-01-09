@@ -1,87 +1,82 @@
-# I = linha
-# J = coluna
-
 import os
 import WConio2
 import cursor
 
-VAZIO = " "
-matrizI = 20
-matrizJ = 40
-aviaoI = 10
-aviaoJ = 19
-aviao = "$"
+VAZIO = " "  # Espaço vazio
+RIO = "\033[38;5;33m\u2588\033[0m"  # Rio com a cor azul
+linha = 20
+coluna = 25
+aviao_linha = 8 #Posição do avião linha
+aviao_coluna = 12  # Posição do avião coluna
+aviao = "\033[48;5;196m\u2588\033[0m"  # Avião
 relogio = 0
 matriz = []
 
+# Limpa a matriz preenchendo todos os valores com o símbolo do rio.
 def limparTela(matriz): 
-    '''
-        função que limpa a tela do jogo apagando todos os valores 
-        da matriz de controle
-    '''
-    for i in range(matrizI):
-        for j in range(matrizJ): 
-            matriz[i][j] = VAZIO
+    for i in range(linha):
+        for j in range(coluna):
+            matriz[i][j] = RIO
 
-
+# Desenha a tela do jogo com delimitadores laterais em verde e o conteúdo da matriz no meio.
 def delimitacao(matriz):
-    '''
-        função que desenha a tela do jogo imprimindo uma sequencia de 
-        linhas de strings com conteúdo da matriz de controle do jogo
-    '''
-    # Imprimir separador vertical na esquerda de cada linha
-    for i in range(matrizI):
-        print("|", end="")  # Separador na vertical antes de cada linha da matriz
-        
-        # Imprimir o conteúdo da linha da matriz
-        for j in range(matrizJ):
+    for i in range(linha):
+        # Delimitadores laterais
+        print("\033[32m\u2588\033[0m" * 2, end="")  
+        for j in range(coluna):
             print(matriz[i][j], end="")
+        print("\033[32m\u2588\033[0m" * 2)
+    print(" " * (coluna + 4))  # Espaçamento inferior
 
-        # Depois de imprimir uma linha da matriz, pular para a próxima linha
-        print("|")  # Separador na vertical no final de cada linha
-
-    # Imprimir o separador vertical na parte inferior
-    print("_" * (matrizJ + 2))  # Separador parte inferior
-
-
-#Parte principal do programa
+# Parte principal do programa
 if __name__ == '__main__':
-    os.system('cls')
+    os.system('cls' if os.name == 'nt' else 'clear')
     cursor.hide()
 
-    #inicialiando a matriz de controle
-    for i in range(matrizI):
-        matriz.append([])
-        for j in range(matrizJ):
-            matriz[i].append(VAZIO)
+    # Inicializando a matriz com valores vazios
+    for i in range(linha):
+        matriz.append([VAZIO] * coluna)
 
-    while(True):
-        #posicionando cursor da tela sempre no mesmo lugar
-        WConio2.gotoxy(0,0)
-        if relogio % 500 == 0 and bichoI < 19: 
-            bichoI += 1
+    while True:
+        # Posiciona o cursor no canto superior esquerdo da tela
+        WConio2.gotoxy(0, 0)
         
-        #limpando a matriz antes de desenhar nela
+        # Movimentos automáticos do jogo
+        if relogio % 500 == 0 and aviao_linha < linha - 1:
+            aviao_linha += 1       
+
+        # Limpa a matriz antes de desenhar
         limparTela(matriz)
 
-        #colocar personagens dentro da matriz
-        matriz[aviaoI][aviaoJ] = aviao
+        # Garantindo que o avião permaneça dentro da matriz
+        aviao_linha = max(1, min(aviao_linha, linha - 2))
+        aviao_coluna = max(1, min(aviao_coluna, coluna - 2))
 
-        #impressão na tela
+        # Desenha o avião na matriz (verificando os limites)
+        matriz[aviao_linha][aviao_coluna] = aviao
+        if aviao_coluna + 1 < coluna:
+            matriz[aviao_linha][aviao_coluna + 1] = aviao
+        if aviao_coluna - 1 >= 0:
+            matriz[aviao_linha][aviao_coluna - 1] = aviao
+        if aviao_linha - 1 >= 0:
+            matriz[aviao_linha - 1][aviao_coluna] = aviao
+        if aviao_linha + 1 < linha:
+            matriz[aviao_linha + 1][aviao_coluna] = aviao
+
+        # Imprime a tela com a matriz
         delimitacao(matriz)
 
-        #atualizando relogio do jogo
+        # Atualiza o relógio do jogo
         relogio += 1
 
-        #controlando personages
+        # Controle do avião
         if WConio2.kbhit():
             value, symbol = WConio2.getch()
-
-            if symbol == 'a':
-                aviaoJ -= 1
-            elif symbol == 'd':
-                aviaoJ += 1
-            elif symbol == 'w':
-                bichoI -= 1
-            elif symbol == 's':
-                bichoI += 1 
+            if symbol == 'a':  # Esquerda
+                aviao_coluna -= 1
+            elif symbol == 'd':  # Direita
+                aviao_coluna += 1
+            elif symbol == 'w':  # Cima
+                aviao_linha -= 1
+            elif symbol == 's':  # Baixo
+                aviao_linha += 1
