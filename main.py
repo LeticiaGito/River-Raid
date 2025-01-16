@@ -71,10 +71,10 @@ def detectar_colisao():
     global pontuacao, combustivel
     colidiu = False
 
-    for dx in [-1, 0, 1]:
-        for dy in [-1, 0, 1]:
-            x = aviao_coluna + dx
-            y = aviao_linha + dy
+    for deslocamento_x in [-1, 0, 1]:
+        for deslocamento_y in [-1, 0, 1]:
+            pos_x = aviao_coluna + deslocamento_x
+            pos_y = aviao_linha + deslocamento_y
             if 0 <= x < coluna and 0 <= y < linha:
                 if matriz[y][x] == OBSTACULO:
                     print("Game Over! Que pena, você colidiu com um obstáculo!")
