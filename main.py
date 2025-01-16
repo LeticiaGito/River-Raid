@@ -51,7 +51,11 @@ def delimitacao(matriz):
             print(matriz[i][j], end="")
         print("\033[32m\u2588\033[0m" * 2)
     print(" " * (coluna + 4))  # Espaçamento inferior
-
+    #uma linha extra nessa função que imprime a string retornada pela função informacoes_do_jogador
+    print("\033[32\u2588\033[0m" * 2, end = "")
+    print(informacoes_do_jogador(pontuacao, combustivel).center(coluna), end = "")
+    print("\033[032\u2588\033[0m" * 2)
+    
 #Adiciona os obstáculos e combustíveis
 def adicionar_obstaculos():
     for _ in range(3):
@@ -82,7 +86,10 @@ def detectar_colisao():
 
     return colidiu
 
-
+#Função de exibição das informações do jogador(pontuação, combustível)
+def informacoes_do_jogador(pontuacao, combustivel):
+    return f"Pontuação: {pontuacao} | Combustível restante: {combustivel:.1f}"
+    
 # Parte principal do programa
 if __name__ == '__main__':
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -132,7 +139,10 @@ if __name__ == '__main__':
             matriz[aviao_linha - 1][aviao_coluna] = AVIAO
         if aviao_linha + 1 < linha:
             matriz[aviao_linha + 1][aviao_coluna] = AVIAO
-
+        
+        #chama a função que mostra a pontuação e o combustivel do jogador:
+        informacoes_do_jogador(pontuacao, combustivel)
+        
         # Imprime a tela com a matriz
         delimitacao(matriz)
 
