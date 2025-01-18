@@ -88,8 +88,8 @@ def detectar_colisao():
 
 #Função de exibição das informações do jogador(pontuação, combustível)
 def informacoes_do_jogador(pontuacao, combustivel):
-    return f"Pontuação: {pontuacao} | Combustível restante: {combustivel:.1f}"
-    
+    return f"\033[33mPontuação:\033[0m {pontuacao} | \033[33mCombustível restante:\033[0m {combustivel:.1f}%"
+
 # Parte principal do programa
 if __name__ == '__main__':
     os.system('cls' if os.name == 'nt' else 'clear')
