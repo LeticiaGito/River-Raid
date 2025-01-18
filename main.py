@@ -3,27 +3,64 @@ import WConio2
 import cursor
 import random
 import time
+import json
 
 #configurações dos elementos de jogo
 VAZIO = " "  # Espaço vazio
-RIO = "\033[38;5;33m\u2588\033[0m"  # Rio com a cor azul
-AVIAO = "\033[48;5;196m\u2588\033[0m"  # Avião
-OBSTACULO = "\033[48;5;196m\u25A0\033[0m"  # Obstáculo em vermelho
-COMBUSTIVEL = "\033[48;5;226m\u25B2\033[0m"  # Combustível em amarelo
+RIO = "\033[38;5;33m█\033[0m"  # Rio com a cor azul
+AVIAO = "\033[48;5;196m█\033[0m"  
+OBSTACULO = "\033[48;5;196m■\033[0m"  # Obstáculo em vermelho
+COMBUSTIVEL = "\033[48;5;226m▲\033[0m"  # Combustível em amarelo
 
 #dimensões do mapa no jogo
 linha = 20
 coluna = 25
-aviao_linha = 8 #Posição do avião linha
-aviao_coluna = 12  # Posição do avião coluna
-relogio = 0
+aviao_linha = linha - 3 #Posição do avião linha
+aviao_coluna = coluna // 2  # Posição do avião coluna
 matriz = []
+
+#Variáveis do jogo
+relogio = 0
 combustivel = 100
-velocidade = 0.1
+velocidade = 0.1 #velocidade inicial do jogo
 pontuacao = 0 
 
+#arquivo que salva as pontuações
+arquivo_pontuacao = "pontuacao.json"
 
-# Limpa a matriz preenchendo todos os valores com o símbolo do rio.
+#função para carregar as pontuações do arquivo
+def carregar_pontuacoes():
+    if os.path.exists(arquivo_pontuacao):
+        with open(arquivo_pontuacao, "r") as arquivo:
+            return json.load(arquivo)
+    return []
+
+#função para salvar uma nova pontuação
+def salvar_pontuacao(nome_jogador, pontuacao_final):
+    pontuacoes = carregar_pontuacoes()
+    pontuacoes.append({"nome": nome_jogador, "pontuacao": pontuacao_final})
+
+    #filtra pontuações válidas
+    pontuacoes = [pontuacao for pontuacao in pontuacoes if pontuacao.get("pontuacao") is not None]
+
+    #ordena as pontuações
+    pontuacoes = sorted(pontuacoes, key=lambda x: x["pontuacao"], reverse=True)
+
+    # Salva as pontuações ordenadas no arquivo
+    with open(arquivo_pontuacao, "w") as arquivo:
+        json.dump(pontuacoes, arquivo, indent=4)
+
+#função para exibir as pontuações no menu
+def exibir_pontuacoes():
+    pontuacoes = carregar_pontuacoes()
+    print("\n=== Pontuações Salvas ===")
+    if pontuacoes:
+        for rank, entrada in enumerate(pontuacoes, start=1):
+            print(f"{rank}. {entrada['nome']} - {entrada['pontuacao']}")
+    else:
+        print("Nenhuma pontuação salva ainda!")
+
+#limpa a matriz preenchendo todos os valores com o símbolo do rio.
 def limparTela(matriz): 
     for i in range(linha):
         for j in range(coluna):
@@ -37,6 +74,10 @@ def limpar_posicao():
             pos_y = aviao_linha + deslocamento_y
             if 0 <= pos_x < coluna and 0 <= pos_y <linha:
                  matriz[pos_y][pos_x] = RIO
+
+#limpa a antiga posição do avião antes de redesenhar
+def limpar_posicao():
+    matriz[aviao_linha][aviao_coluna] = RIO
 
 #Desenha o avião na nova posição 
 def desenhar_aviao():
@@ -55,17 +96,28 @@ def delimitacao(matriz):
     print("\033[32\u2588\033[0m" * 2, end = "")
     print(informacoes_do_jogador(pontuacao, combustivel).center(coluna), end = "")
     print("\033[032\u2588\033[0m" * 2)
-    
-#Adiciona os obstáculos e combustíveis
+
+# Move os obstáculos para baixo e remove os que saírem da tela
+def mover_obstaculos():
+    for i in range(linha - 1, -1, -1):  # Itera de baixo para cima
+        for j in range(coluna):
+            if matriz[i][j] in [OBSTACULO, COMBUSTIVEL]:
+                if i == linha - 1:  # Remove obstáculos na última linha
+                    matriz[i][j] = RIO
+                else:  # Move obstáculos para baixo
+                    if matriz[i + 1][j] == RIO:  # Apenas move se a posição abaixo estiver vazia
+                        matriz[i + 1][j] = matriz[i][j]
+                        matriz[i][j] = RIO
+                        
+# Adiciona novos obstáculos e combustíveis na linha superior
 def adicionar_obstaculos():
-    for _ in range(3):
+    num_objetos = random.randint(1, 1)  # Define o número de objetos a adicionar
+    for _ in range(num_objetos):
         tipo_objeto = random.choice([OBSTACULO, COMBUSTIVEL])
-        while True:
-            coluna_random = random.randint(0, coluna - 1)
-            linha_random = random.randint(0, linha - 1)
-            if matriz[linha_random][coluna_random] == RIO:
-                matriz[linha_random][coluna_random] = tipo_objeto
-                break
+        coluna_random = random.randint(0, coluna - 1)
+        if matriz[0][coluna_random] == RIO:
+            matriz[0][coluna_random] = tipo_objeto
+                
 #Detecta colisões
 def detectar_colisao():
     global pontuacao, combustivel
@@ -75,29 +127,57 @@ def detectar_colisao():
         for deslocamento_y in [-1, 0, 1]:
             pos_x = aviao_coluna + deslocamento_x
             pos_y = aviao_linha + deslocamento_y
-            if 0 <= x < coluna and 0 <= y < linha:
-                if matriz[y][x] == OBSTACULO:
+            if 0 <= pos_x < coluna and 0 <= pos_y < linha:
+                if matriz[pos_y][pos_x] == OBSTACULO:
                     print("Game Over! Que pena, você colidiu com um obstáculo!")
                     colidiu = True
-                elif matriz[y][x] == COMBUSTIVEL:
+                elif matriz[pos_y][pos_x] == COMBUSTIVEL:
                     pontuacao += 10
-                    combustivel += 20
-                    matriz[y][x] = RIO  # Limpa a posição do combustível
+                    combustivel = min(combustivel + 20, 100)  # Evita que o combustível ultrapasse 100
+                    matriz[aviao_linha][aviao_coluna] = RIO  # Remove o combustível após coleta
+                    matriz[pos_y][pos_x] = RIO  # Limpa a posição do combustível
 
     return colidiu
 
-#Função de exibição das informações do jogador(pontuação, combustível)
-def informacoes_do_jogador(pontuacao, combustivel):
-    return f"\033[33mPontuação:\033[0m {pontuacao} | \033[33mCombustível restante:\033[0m {combustivel:.1f}%"
+# Exibe informações do jogador (pontuação e combustível restante)
+def informacoes_do_jogador():
+    return f"Pontuação: {pontuacao} | Combustível: {combustivel:.1f}"
 
-# Parte principal do programa
-if __name__ == '__main__':
-    os.system('cls' if os.name == 'nt' else 'clear')
-    cursor.hide()
-
-    # Inicializando a matriz com valores vazios
+# Imprime a tela do jogo
+def delimitacao(matriz):
+    os.system('cls' if os.name == 'nt' else 'clear')  # Limpa a tela
     for i in range(linha):
-        matriz.append([VAZIO] * coluna)
+        print("\033[32m█\033[0m" * 2, end="")  # Bordas laterais
+        for j in range(coluna):
+            print(matriz[i][j], end="")
+        print("\033[32m█\033[0m" * 2)
+    print("\033[32m█\033[0m" * 2, end="")
+    print(informacoes_do_jogador().center(coluna), end="")
+    print("\033[32m█\033[0m" * 2)
+
+# Função para reiniciar o estado do jogo
+def reiniciar_jogo():
+    global pontuacao, combustivel, relogio, aviao_linha, aviao_coluna, matriz
+
+    # Reinicia as variáveis do jogo
+    pontuacao = 0
+    combustivel = 100
+    relogio = 0
+    aviao_linha = linha - 3  # Posição inicial do avião na linha
+    aviao_coluna = coluna // 2  # Posição inicial do avião na coluna
+
+    # Reinicia a matriz (preenchendo com o rio)
+    matriz = [[RIO] * coluna for _ in range(linha)]
+
+# Inicialização da matriz
+for i in range(linha):
+    matriz.append([RIO] * coluna)
+    
+# Parte principal do programa
+def jogar()
+    global combustivel, pontuacao, velocidade, relogio, aviao_coluna
+    reiniciar_jogo
+    cursor.hide()
 
     while True:
         # Posiciona o cursor no canto superior esquerdo da tela
@@ -105,65 +185,73 @@ if __name__ == '__main__':
 
         #limpa a posição anterior do avião
         limpar_posicao()
+        mover_obstaculos()
+        adicionar_obstaculos()
 
-         #Diminui a quantidade de combustível gradualmente
-        combustivel -= 1
+        #atualiza a posição do avião
+        desenhar_aviao()
+
+        #exibe a tela
+        delimitacao(matriz)
+
+        #detecta colisões
+        if detectar_colisao():
+            break
+
+        #diminui a quantidade de combustível gradualmente
+        combustivel -= 0.5
         if combustivel <= 0:
             print("Game Over! O seu combustível acabou!")
             break
-        
-        # Movimentos automáticos do jogo
-        if relogio % 500 == 0 and aviao_linha < linha - 1:
-            aviao_linha += 1       
 
-        # Limpa a matriz antes de desenhar
-        limparTela(matriz)
-
-        #Adiciona os obstáculos e combustíveis 
-        adicionar_obstaculos()
-        
-        # Garantindo que o avião permaneça dentro da matriz
-        aviao_linha = max(1, min(aviao_linha, linha - 2))
-        aviao_coluna = max(1, min(aviao_coluna, coluna - 2))
-
-        #Desenha o avião na nova posição
-        desenhar_aviao()
-        
-        #desenha o avião na matriz verificando os limites 
-        matriz[aviao_linha][aviao_coluna] = AVIAO
-        if aviao_coluna + 1 < coluna:
-            matriz[aviao_linha][aviao_coluna + 1] = AVIAO
-        if aviao_coluna - 1 >= 0:
-            matriz[aviao_linha][aviao_coluna - 1] = AVIAO
-        if aviao_linha - 1 >= 0:
-            matriz[aviao_linha - 1][aviao_coluna] = AVIAO
-        if aviao_linha + 1 < linha:
-            matriz[aviao_linha + 1][aviao_coluna] = AVIAO
-        
-        #chama a função que mostra a pontuação e o combustivel do jogador:
-        informacoes_do_jogador(pontuacao, combustivel)
-        
-        # Imprime a tela com a matriz
-        delimitacao(matriz)
-
-        #Detecta as colisões
-        if detectar_colisao():
-            break 
-
-        # Atualiza o relógio do jogo
-        relogio += 1
-
-         # Controle do avião
+        #controle do avião
         if WConio2.kbhit():
-            value, symbol = WConio2.getch()
-            if symbol in ['a', 'A']:  # Esquerda
+            _, tecla = WConio2.getch()
+            if tecla in ['a', 'A'] and aviao_coluna > 0:  # Esquerda
+                limpar_posicao()
                 aviao_coluna -= 1
-            elif symbol in ['d', 'D']:  # Direita
+            elif tecla in ['d', 'D'] and aviao_coluna < coluna - 1:  # Direita
+                limpar_posicao()
                 aviao_coluna += 1
-            elif symbol in ['w', 'W']:  # Cima
-                aviao_linha -= 1
-            elif symbol in ['s', 'S']:  # Baixo
-                aviao_linha += 1
+            time.sleep(0.0005)  #reduz a pausa após o movimento do avião
+
+        #ajusta a dificuldade com o tempo
+        relogio += 1
+        if relogio % 100 == 0:
+            velocidade = max(0.02, velocidade - 0.005)  # Aumenta a velocidade
 
         #Pausa para desacelerar
-        time.sleep(0.1)
+        time.sleep(velocidade)
+
+    cursor.show()
+    return pontuacao  #retorna a pontuação final
+
+#menu
+def main_menu():
+    while True:
+        print("\n=== Menu Principal ===")
+        print("1. Jogar")
+        print("2. Ver Pontuações")
+        print("3. Sair")
+        escolha = input("Escolha uma opção: ")
+
+        if escolha == "1":
+            pontuacao_final = jogar()
+            print(f"Sua pontuação final foi: {pontuacao_final}")
+            salvar_opcao = input("Deseja salvar sua pontuação? (s/n): ").strip().lower()
+            if salvar_opcao == "s":
+                nome_jogador = input("Digite seu nome: ")
+                salvar_pontuacao(nome_jogador, pontuacao_final)
+                print("Pontuação salva com sucesso!")
+        elif escolha == "2":
+            exibir_pontuacoes()
+        elif escolha == "3":
+            print("Saindo do jogo. Até logo!")
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
+
+#iniciar o menu
+if __name__ == "__main__":
+    main_menu()
+
