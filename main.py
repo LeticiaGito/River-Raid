@@ -176,7 +176,7 @@ for i in range(linha):
 # Parte principal do programa
 def jogar()
     global combustivel, pontuacao, velocidade, relogio, aviao_coluna
-    reiniciar_jogo
+    reiniciar_jogo()
     cursor.hide()
 
     while True:
