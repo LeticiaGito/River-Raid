@@ -24,7 +24,7 @@ relogio = 0
 combustivel = 100
 velocidade = 0.1 #velocidade inicial do jogo
 pontuacao = 0 
-
+pausado = False
 #arquivo que salva as pontuações
 arquivo_pontuacao = "pontuacao.json"
 
@@ -172,10 +172,35 @@ def reiniciar_jogo():
 # Inicialização da matriz
 for i in range(linha):
     matriz.append([RIO] * coluna)
+
+#Função que exibe o menu de pausa
+def tela_de_pause():
+    global pausado 
+    os.system('cls' if os.name == 'nt' else 'clear')  # Limpa a tela
+    print("╔════════════════════════════════════════════════════════════╗")
+    print("║                        MENU DE PAUSE                       ║")
+    print("╚════════════════════════════════════════════════════════════╝")
+    print("")
+
+    print("         ╔═════════════════╗   ╔═════════════════╗  ")
+    print("         ║ 1.Retomar jogo  ║   ║    2. Sair      ║  ")
+    print("         ╚═════════════════╝   ╚═════════════════╝  ")
+    print("")
+
+ while True:
+        escolha = input("Escolha uma opção: ").strip()
+        if escolha == "1":
+            pausado = False
+            break
+        elif escolha == "2":
+            return True  
+        else:
+            print("Opção inválida. Tente novamente.")
+return False
     
 # Parte principal do programa
 def jogar()
-    global combustivel, pontuacao, velocidade, relogio, aviao_coluna
+    global pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
     reiniciar_jogo()
     cursor.hide()
 
@@ -183,6 +208,11 @@ def jogar()
         # Posiciona o cursor no canto superior esquerdo da tela
         WConio2.gotoxy(0, 0)
 
+        # Verifica se o jogo está pausado
+        if pausado:
+            if tela_de_pause():  # Exibe o menu de pausa
+                break  # Sai para o menu principal
+                
         #limpa a posição anterior do avião
         limpar_posicao()
         mover_obstaculos()
