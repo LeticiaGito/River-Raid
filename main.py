@@ -187,16 +187,16 @@ def tela_de_pause():
     print("         ╚═════════════════╝   ╚═════════════════╝  ")
     print("")
 
- while True:
+    while True:
         escolha = input("Escolha uma opção: ").strip()
         if escolha == "1":
             pausado = False
             break
         elif escolha == "2":
-            return True  
+                return True  
         else:
             print("Opção inválida. Tente novamente.")
-return False
+    return False
     
 # Parte principal do programa
 def jogar()
