@@ -199,7 +199,7 @@ def tela_de_pause():
     return False
     
 # Parte principal do programa
-def jogar()
+def jogar():
     global pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
     reiniciar_jogo()
     cursor.hide()
