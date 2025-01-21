@@ -159,29 +159,35 @@ def reiniciar_jogo():
 for i in range(linha):
     matriz.append([RIO] * coluna)
 
-#Função que exibe o menu de pausa
+# Função que exibe o menu de pausa
 def tela_de_pause():
-    global pausado 
-    os.system('cls' if os.name == 'nt' else 'clear')  # Limpa a tela
-    print("╔════════════════════════════════════════════════════════════╗")
-    print("║                        MENU DE PAUSE                       ║")
-    print("╚════════════════════════════════════════════════════════════╝")
+    global pausado
+    os.system('cls' if os.name == 'nt' else 'clear') # Limpa a tela
+
+    print("╔═══════════════════════╗")
+    print("║     JOGO PAUSADO      ║")
+    print("╚═══════════════════════╝")
     print("")
 
-    print("         ╔═════════════════╗   ╔═════════════════╗  ")
-    print("         ║ 1.Retomar jogo  ║   ║    2. Sair      ║  ")
-    print("         ╚═════════════════╝   ╚═════════════════╝  ")
-    print("")
+    print("   ╔═════════════════╗")
+    print("   ║   1.Continuar   ║")
+    print("   ╚═════════════════╝")
+    print("   ╔═════════════════╗")
+    print("   ║     2.Sair      ║")
+    print("   ╚═════════════════╝")
 
     while True:
-        escolha = input("Escolha uma opção: ").strip()
-        if escolha == "1":
-            pausado = False
-            break
-        elif escolha == "2":
-                return True  
-        else:
-            print("Opção inválida. Tente novamente.")
+        if WConio2.kbhit():
+            _, tecla = WConio2.getch()
+            if tecla in ['1']:
+                return False
+        
+            elif tecla in ['2']:
+                return True
+        
+            else: 
+                print('Opção inválida.')
+
     return False
     
 # Parte principal do programa
@@ -191,13 +197,15 @@ def jogar():
     cursor.hide()
 
     while True:
+
+        if pausado:
+            if tela_de_pause():
+                break
+            pausado = False
+            continue
+
         # Posiciona o cursor no canto superior esquerdo da tela
         WConio2.gotoxy(0, 0)
-
-        # Verifica se o jogo está pausado
-        if pausado:
-            if tela_de_pause():  # Exibe o menu de pausa
-                break  # Sai para o menu principal
                 
         #limpa a posição anterior do avião
         limpar_posicao()
@@ -229,8 +237,9 @@ def jogar():
             elif tecla in ['d', 'D'] and aviao_coluna < coluna - 1:  # Direita
                 limpar_posicao()
                 aviao_coluna += 1
-            elif tecla in ['p', 'P']:  # Pausa
+            elif tecla in ['\u001B']:
                 pausado = True
+
             time.sleep(0.0005)  #reduz a pausa após o movimento do avião
 
         #ajusta a dificuldade com o tempo
@@ -248,29 +257,54 @@ def jogar():
 #menu
 def main_menu():
     while True:
-        print("\n=== Menu Principal ===")
-        print("1. Jogar")
-        print("2. Ver Pontuações")
-        print("3. Sair")
-        escolha = input("Escolha uma opção: ")
+        # Exibe o menu apenas uma vez
+        os.system('cls' if os.name == 'nt' else 'clear')  
+        print("╔════════════════════════════════════════════════════════════╗")
+        print("║                            MENU                            ║")
+        print("╚════════════════════════════════════════════════════════════╝")
+        print("╔═════════════════╗   ╔═════════════════╗  ╔═════════════════╗")
+        print("║    1. Jogar     ║   ║  2. HighScores  ║  ║     3. Sair     ║")
+        print("╚═════════════════╝   ╚═════════════════╝  ╚═════════════════╝")
+        
+        tecla = None
+        while tecla not in ['1', '2', '3']:  
+            if WConio2.kbhit():
+                _, tecla = WConio2.getch()
 
-        if escolha == "1":
+        if tecla == '1':  # Jogar
             pontuacao_final = jogar()
             print(f"Sua pontuação final foi: {pontuacao_final}")
             salvar_opcao = input("Deseja salvar sua pontuação? (s/n): ").strip().lower()
+
             if salvar_opcao == "s":
                 nome_jogador = input("Digite seu nome: ")
                 salvar_pontuacao(nome_jogador, pontuacao_final)
                 print("Pontuação salva com sucesso!")
-        elif escolha == "2":
+
+            # Aguardar o Enter para voltar ao menu
+            print("Pressione Enter para voltar ao menu...")
+            while True:
+                if WConio2.kbhit():
+                    _, tecla = WConio2.getch()
+                    if tecla == '\r':  
+                        break  
+
+        elif tecla == '2':  # Highscores
+            os.system('cls' if os.name == 'nt' else 'clear')
             exibir_pontuacoes()
-        elif escolha == "3":
+
+            # Aguardar o Enter para voltar ao menu
+            print("Pressione Enter para voltar ao menu...")
+            while True:
+                if WConio2.kbhit():
+                    _, tecla = WConio2.getch()
+                    if tecla == '\r':  
+                        break  
+
+        elif tecla == '3':  # Sair
             print("Saindo do jogo. Até logo!")
-            break
-        else:
-            print("Opção inválida. Tente novamente.")
+            break  # Encerra o loop principal e sai do programa
 
 #iniciar o menu
 if __name__ == "__main__":
     main_menu()
-
