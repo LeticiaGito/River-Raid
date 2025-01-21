@@ -25,6 +25,7 @@ combustivel = 100
 velocidade = 0.1 #velocidade inicial do jogo
 pontuacao = 0 
 pausado = False
+
 #arquivo que salva as pontuações
 arquivo_pontuacao = "pontuacao.json"
 
@@ -145,7 +146,6 @@ def informacoes_do_jogador():
 
 # Imprime a tela do jogo
 def delimitacao(matriz):
-    os.system('cls' if os.name == 'nt' else 'clear')  # Limpa a tela
     for i in range(linha):
         print("\033[32m█\033[0m" * 2, end="")  # Bordas laterais
         for j in range(coluna):
@@ -256,6 +256,7 @@ def jogar():
         time.sleep(velocidade)
 
     cursor.show()
+    limparTela(matriz) #limpar a tela sem piscar
     return pontuacao  #retorna a pontuação final
 
 #menu
