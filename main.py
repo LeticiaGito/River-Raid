@@ -243,6 +243,8 @@ def jogar():
             elif tecla in ['d', 'D'] and aviao_coluna < coluna - 1:  # Direita
                 limpar_posicao()
                 aviao_coluna += 1
+            elif tecla in ['p', 'P']:  # Pausa
+                pausado = True
             time.sleep(0.0005)  #reduz a pausa após o movimento do avião
 
         #ajusta a dificuldade com o tempo
