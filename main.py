@@ -84,19 +84,6 @@ def limpar_posicao():
 def desenhar_aviao():
     matriz[aviao_linha][aviao_coluna] = AVIAO
 
-# Desenha a tela do jogo com delimitadores laterais em verde e o conteúdo da matriz no meio.
-def delimitacao(matriz):
-    for i in range(linha):
-        # Delimitadores laterais
-        print("\033[32m\u2588\033[0m" * 2, end="")  
-        for j in range(coluna):
-            print(matriz[i][j], end="")
-        print("\033[32m\u2588\033[0m" * 2)
-    print(" " * (coluna + 4))  # Espaçamento inferior
-    #uma linha extra nessa função que imprime a string retornada pela função informacoes_do_jogador
-    print("\033[32\u2588\033[0m" * 2, end = "")
-    print(informacoes_do_jogador(pontuacao, combustivel).center(coluna), end = "")
-    print("\033[032\u2588\033[0m" * 2)
 
 # Move os obstáculos para baixo e remove os que saírem da tela
 def mover_obstaculos():
@@ -151,9 +138,8 @@ def delimitacao(matriz):
         for j in range(coluna):
             print(matriz[i][j], end="")
         print("\033[32m█\033[0m" * 2)
-    print("\033[32m█\033[0m" * 2, end="")
-    print(informacoes_do_jogador().center(coluna), end="")
-    print("\033[32m█\033[0m" * 2)
+    print(informacoes_do_jogador().center(coluna + 4))#Exibe as informações do jogador
+   
 
 # Função para reiniciar o estado do jogo
 def reiniciar_jogo():
