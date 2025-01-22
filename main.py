@@ -129,7 +129,9 @@ def detectar_colisao():
 
 # Exibe informações do jogador (pontuação e combustível restante)
 def informacoes_do_jogador():
-    return f"Pontuação: {pontuacao} | Combustível: {combustivel:.1f}"
+    pontuacao_str = f"\033[38;5;226mPontuação: {pontuacao}\033[0m"#imprime a informação na cor amarela para o jogador
+    combustivel_str = f"\033[38;5;226mCombustível: {combustivel:.1f}\033[0m"
+    return f"{pontuacao_str} | {combustivel_str}"
 
 # Imprime a tela do jogo
 def delimitacao(matriz):
@@ -164,18 +166,17 @@ def tela_de_pause():
     global pausado
     os.system('cls' if os.name == 'nt' else 'clear') # Limpa a tela
 
-    print("╔═══════════════════════╗")
-    print("║     JOGO PAUSADO      ║")
-    print("╚═══════════════════════╝")
+    print("\033[38;5;3m╔═══════════════════════╗\033[0m")
+    print("\033[38;5;3m║\033[0m     \033[38;5;11mJOGO PAUSADO\033[0m      \033[38;5;3m║\033[0m")
+    print("\033[38;5;3m╚═══════════════════════╝\033[0m")
     print("")
 
-    print("   ╔═════════════════╗")
-    print("   ║   1.Continuar   ║")
-    print("   ╚═════════════════╝")
-    print("   ╔═════════════════╗")
-    print("   ║     2.Sair      ║")
-    print("   ╚═════════════════╝")
-
+    print("   \033[38;5;3m╔═════════════════╗\033[0m")
+    print("   \033[38;5;3m║\033[0m   \033[38;5;11m1.Continuar\033[0m   \033[38;5;3m║\033[0m")
+    print("   \033[38;5;3m╚═════════════════╝\033[0m")
+    print("   \033[38;5;3m╔═════════════════╗\033[0m")
+    print("   \033[38;5;3m║\033[0m     \033[38;5;11m2.Sair\033[0m      \033[38;5;3m║\033[0m")
+    print("   \033[38;5;3m╚═════════════════╝\033[0m")
     while True:
         if WConio2.kbhit():
             _, tecla = WConio2.getch()
