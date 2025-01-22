@@ -131,6 +131,7 @@ def detectar_colisao():
 def informacoes_do_jogador():
     pontuacao_str = f"\033[38;5;226mPontuação: {pontuacao}\033[0m"#imprime a informação na cor amarela para o jogador
     combustivel_str = f"\033[38;5;226mCombustível: {combustivel:.1f}\033[0m"
+    print("")
     return f"{pontuacao_str} | {combustivel_str}"
 
 # Imprime a tela do jogo
@@ -141,6 +142,7 @@ def delimitacao(matriz):
             print(matriz[i][j], end="")
         print("\033[32m█\033[0m" * 2)
     print(informacoes_do_jogador().center(coluna + 4))#Exibe as informações do jogador
+    print("")
    
 
 # Função para reiniciar o estado do jogo
@@ -165,18 +167,18 @@ for i in range(linha):
 def tela_de_pause():
     global pausado
     os.system('cls' if os.name == 'nt' else 'clear') # Limpa a tela
-
-    print("\033[38;5;3m╔═══════════════════════╗\033[0m")
-    print("\033[38;5;3m║\033[0m     \033[38;5;11mJOGO PAUSADO\033[0m      \033[38;5;3m║\033[0m")
-    print("\033[38;5;3m╚═══════════════════════╝\033[0m")
-    print("")
-
-    print("   \033[38;5;3m╔═════════════════╗\033[0m")
-    print("   \033[38;5;3m║\033[0m   \033[38;5;11m1.Continuar\033[0m   \033[38;5;3m║\033[0m")
-    print("   \033[38;5;3m╚═════════════════╝\033[0m")
-    print("   \033[38;5;3m╔═════════════════╗\033[0m")
-    print("   \033[38;5;3m║\033[0m     \033[38;5;11m2.Sair\033[0m      \033[38;5;3m║\033[0m")
-    print("   \033[38;5;3m╚═════════════════╝\033[0m")
+    print("\033[38;5;3m╔═══════════════════════════╗\033[0m")
+    print("\033[38;5;3m║                           ║\033[0m")
+    print("\033[38;5;3m║\033[0m        \033[38;5;11mJOGO PAUSADO\033[0m     \033[38;5;3m  ║\033[0m")
+    print("\033[38;5;3m║                           ║\033[0m")
+    print("\033[38;5;3m║   ╔═══════════════════╗   ║\033[0m")
+    print("\033[38;5;3m║   ║\033[0m   \033[38;5;11m1.Retomar jogo\033[0m\033[38;5;3m  ║   ║\033[0m")
+    print("\033[38;5;3m║   ╚═══════════════════╝   ║\033[0m")
+    print("\033[38;5;3m║   ╔═══════════════════╗   ║\033[0m")
+    print("\033[38;5;3m║   ║\033[0m       \033[38;5;11m2.Sair\033[0m      \033[38;5;3m║   ║\033[0m")
+    print("\033[38;5;3m║   ╚═══════════════════╝   ║\033[0m")
+    print("\033[38;5;3m║                           ║\033[0m")
+    print("\033[38;5;3m╚═══════════════════════════╝\033[0m")
     while True:
         if WConio2.kbhit():
             _, tecla = WConio2.getch()
@@ -259,16 +261,27 @@ def jogar():
 def main_menu():
     while True:
         # Exibe o menu apenas uma vez
-        os.system('cls' if os.name == 'nt' else 'clear')  
-        print("╔════════════════════════════════════════════════════════════╗")
-        print("║                            MENU                            ║")
-        print("╚════════════════════════════════════════════════════════════╝")
-        print("╔═════════════════╗   ╔═════════════════╗  ╔═════════════════╗")
-        print("║    1. Jogar     ║   ║  2. HighScores  ║  ║     3. Sair     ║")
-        print("╚═════════════════╝   ╚═════════════════╝  ╚═════════════════╝")
+        os.system('cls')
+        print("\033[38;5;3m╔═══════════════════════════╗\033[0m")
+        print("\033[38;5;3m║                           ║\033[0m")
+        print("\033[38;5;3m║           MENU            ║\033[0m")
+        print("\033[38;5;3m║    ╔═════════════════╗    ║\033[0m")
+        print("\033[38;5;3m║    ║     1.Jogar     ║    ║\033[0m")
+        print("\033[38;5;3m║    ╚═════════════════╝    ║\033[0m")
+        print("\033[38;5;3m║    ╔═════════════════╗    ║\033[0m")
+        print("\033[38;5;3m║    ║   2.Pontuação   ║    ║\033[0m")
+        print("\033[38;5;3m║    ╚═════════════════╝    ║\033[0m")
+        print("\033[38;5;3m║    ╔═════════════════╗    ║\033[0m")
+        print("\033[38;5;3m║    ║   3.Instrução   ║    ║\033[0m")
+        print("\033[38;5;3m║    ╚═════════════════╝    ║\033[0m")
+        print("\033[38;5;3m║    ╔═════════════════╗    ║\033[0m")
+        print("\033[38;5;3m║    ║      4.Sair     ║    ║\033[0m")
+        print("\033[38;5;3m║    ╚═════════════════╝    ║\033[0m")
+        print("\033[38;5;3m║                           ║\033[0m")
+        print("\033[38;5;3m╚═══════════════════════════╝\033[0m")
         
         tecla = None
-        while tecla not in ['1', '2', '3']:  
+        while tecla not in ['1', '2', '3', '4']:  
             if WConio2.kbhit():
                 _, tecla = WConio2.getch()
 
@@ -300,9 +313,35 @@ def main_menu():
                 if WConio2.kbhit():
                     _, tecla = WConio2.getch()
                     if tecla == '\r':  
-                        break  
+                        break
 
-        elif tecla == '3':  # Sair
+        elif tecla == '3':
+            os.system('cls')
+            print("\033[38;5;3m╔═════════════════════════════════╗\033[0m")
+            print("\033[38;5;3m║                                 ║\033[0m")
+            print("\033[38;5;3m║   Voe o máximo que conseguir,   ║\033[0m")  
+            print("\033[38;5;3m║      evitando obstáculos        ║\033[0m")
+            print("\033[38;5;3m║     e coletando gasolina.       ║\033[0m")
+            print("\033[38;5;3m║                                 ║\033[0m")
+            print("\033[38;5;3m║    Você perde se colidir com    ║\033[0m")
+            print("\033[38;5;3m║         um obstáculo ou         ║\033[0m")
+            print("\033[38;5;3m║   quando o combustível acabar   ║\033[0m")
+            print("\033[38;5;3m║                                 ║\033[0m")
+            print("\033[38;5;3m║  Controle:A para ir a esquerda  ║\033[0m") 
+            print("\033[38;5;3m║           D para ir a direita   ║\033[0m") 
+            print("\033[38;5;3m║           P para pausar o jogo  ║\033[0m")
+            print("\033[38;5;3m║                                 ║\033[0m")   
+            print("\033[38;5;3m╚═════════════════════════════════╝\033[0m")
+            print("")
+            print("Pressione Enter para voltar ao menu...")
+            
+            while True:
+                if WConio2.kbhit():
+                    _, tecla = WConio2.getch()
+                    if tecla == '\r':  
+                        break
+
+        elif tecla == '4':  # Sair
             print("Saindo do jogo. Até logo!")
             break  # Encerra o loop principal e sai do programa
 
