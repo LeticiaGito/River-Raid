@@ -227,7 +227,7 @@ def animacao_explosao():
 
 # Parte principal do programa
 def jogar():
-    global nivel_dificuldade pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
+    global nivel_dificuldade, pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
     reiniciar_jogo()
     cursor.hide()
     nivel_dificuldade = 1
@@ -283,7 +283,7 @@ def jogar():
         relogio += 1
         if relogio % 300 == 0:
             velocidade = max(0.02, velocidade - 0.005)  # Aumenta a velocidade
-            nivel_dificuldade = min(nivel_dificuldadde + 0.1, 5) #ajusta o limite máximo de dificuldade
+            nivel_dificuldade = min(nivel_dificuldade + 0.1, 5) #ajusta o limite máximo de dificuldade
         
         #Pausa para desacelerar
         time.sleep(velocidade)
