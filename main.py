@@ -25,6 +25,7 @@ combustivel = 100
 velocidade = 0.1 #velocidade inicial do jogo
 pontuacao = 0 
 pausado = False
+nivel_dificuldade = 1
 
 #arquivo que salva as pontuações
 arquivo_pontuacao = "pontuacao.json"
@@ -100,8 +101,8 @@ def mover_obstaculos():
                         matriz[i][j] = RIO
                         
 # Adiciona novos obstáculos e combustíveis na linha superior
-def adicionar_obstaculos():
-    num_objetos = random.randint(1, 1)  # Define o número de objetos a adicionar
+def adicionar_obstaculos(nivel_dificuldade):
+    num_objetos = random.randint(0, nivel_dificuldade)  # Define o número de objetos a adicionar
     for _ in range(num_objetos):
         tipo_objeto = random.choice([OBSTACULO, COMBUSTIVEL])
         coluna_random = random.randint(0, coluna - 1)
@@ -226,9 +227,10 @@ def animacao_explosao():
 
 # Parte principal do programa
 def jogar():
-    global pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
+    global nivel_dificuldade pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
     reiniciar_jogo()
     cursor.hide()
+    nivel_dificuldade = 1
 
     while True:
 
@@ -244,7 +246,7 @@ def jogar():
         #limpa a posição anterior do avião
         limpar_posicao()
         mover_obstaculos()
-        adicionar_obstaculos()
+        adicionar_obstaculos(nivel_dificuldade)
 
         #atualiza a posição do avião
         desenhar_aviao()
@@ -279,9 +281,10 @@ def jogar():
 
         #ajusta a dificuldade com o tempo
         relogio += 1
-        if relogio % 100 == 0:
+        if relogio % 300 == 0:
             velocidade = max(0.02, velocidade - 0.005)  # Aumenta a velocidade
-
+            nivel_dificuldade = min(nivel_dificuldadde + 0.1, 5) #ajusta o limite máximo de dificuldade
+        
         #Pausa para desacelerar
         time.sleep(velocidade)
 
