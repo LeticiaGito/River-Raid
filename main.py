@@ -118,20 +118,19 @@ def detectar_colisao():
             pos_x = aviao_coluna + deslocamento_x
             pos_y = aviao_linha + deslocamento_y
             
-            if 0 <= pos_x < coluna and 0 <= pos_y < linha:    #Verifica se a posição está fora da matriz (Colisão com a borda do mapa)
-                if not (0 <= pos_x < coluna and 0 <= pos_y < linha):
-                    print("Game over! Que pena, você colidiu com a margem do rio!")
-                    return True
+            if not 0 <= pos_x < coluna and 0 <= pos_y < linha:    #Verifica se a posição está fora da matriz (Colisão com a borda do mapa)   
+                print("Game over! Que pena, você colidiu com a margem do rio!")
+                return True
                     
-                if matriz[pos_y][pos_x] == OBSTACULO: # Verifica se há um obstáculo
-                    print("Game Over! Que pena, você colidiu com um obstáculo!")
-                    return True
+            if matriz[pos_y][pos_x] == OBSTACULO: # Verifica se há um obstáculo
+                print("Game Over! Que pena, você colidiu com um obstáculo!")
+                return True
                     
-                if matriz[pos_y][pos_x] == COMBUSTIVEL: # Verifica se há combustível
-                    pontuacao += 10
-                    combustivel = min(combustivel + 20, 100)  # Evita que o combustível ultrapasse 100
-                    matriz[aviao_linha][aviao_coluna] = RIO  # Remove o combustível após coleta
-                    matriz[pos_y][pos_x] = RIO  # Limpa a posição do combustível
+            if matriz[pos_y][pos_x] == COMBUSTIVEL: # Verifica se há combustível
+                pontuacao += 10
+                combustivel = min(combustivel + 20, 100)  # Evita que o combustível ultrapasse 100
+                matriz[aviao_linha][aviao_coluna] = RIO  # Remove o combustível após coleta
+                matriz[pos_y][pos_x] = RIO  # Limpa a posição do combustível
 
     return colidiu
 
