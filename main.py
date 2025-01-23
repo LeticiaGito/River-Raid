@@ -317,20 +317,32 @@ def main_menu():
         print("\033[38;5;3m╚═══════════════════════════╝\033[0m")
         
         tecla = None
-        while tecla not in ['1', '2', '3', '4']:  
+        while True: 
             if WConio2.kbhit():
                 _, tecla = WConio2.getch()
+
+                if tecla in ['1', '2', '3', '4']:
+                    break  # Sai do loop interno se a tecla for válida
+                else:
+                    print("Opção inválida. Por favor, digite uma das opções: 1, 2, 3 ou 4.")
+
 
         if tecla == '1':  # Jogar
             pontuacao_final = jogar()
             print(f"Sua pontuação final foi: {pontuacao_final}")
+            
             salvar_opcao = input("Deseja salvar sua pontuação? (s/n): ").strip().lower()
+            while salvar_opcao not in ['s', 'n']:
+                print("Opção inválida. Digite 's' para sim ou 'n' para não.")
+                salvar_opcao = input("Deseja salvar sua pontuação? (s/n): ").strip().lower()
 
             if salvar_opcao == "s":
                 nome_jogador = input("Digite seu nome: ")
                 salvar_pontuacao(nome_jogador, pontuacao_final)
                 print("Pontuação salva com sucesso!")
-
+            else:
+                print("Sua pontuação não foi salva.")
+    
             # Aguardar o Enter para voltar ao menu
             print("Pressione Enter para voltar ao menu...")
             while True:
