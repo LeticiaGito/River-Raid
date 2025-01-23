@@ -199,7 +199,31 @@ def tela_de_pause():
                 print('Opção inválida.')
 
             return False
-    
+
+def animacao_explosao():
+    explosao_frames = [
+        ["   *   ", "  * *  ", "   *   "],  # Explosão inicial
+        ["  * *  ", " *   * ", "  * *  "],  # Expansão da explosão
+        [" *   * ", " * * * ", " *   * "],  # Fragmentação
+        ["  * *  ", " * * * ", "  * *  "],  # Fragmentação
+    ]
+   
+    # Cor vermelha para a explosão
+    cor_explosao = "\033[48;5;196m"  # Vermelho
+
+    for frame in explosao_frames:
+        # Preenche a matriz com a animação da explosão
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+        for i in range(3):
+            for j in range(5):
+                if 0 <= aviao_linha + i - 1 < linha and 0 <= aviao_coluna + j - 2 < coluna:
+                    if frame[i][j] != " ":
+                        matriz[aviao_linha + i - 1][aviao_coluna + j - 2] = cor_explosao + frame[i][j] + "\033[0m"
+       
+        delimitacao(matriz)
+        time.sleep(0.2)  # Espera entre os quadros da animação
+
 # Parte principal do programa
 def jogar():
     global pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
@@ -230,6 +254,7 @@ def jogar():
 
         #detecta colisões
         if detectar_colisao():
+            animacao_explosao()  # Exibe animação de explosão
             break
 
         #diminui a quantidade de combustível gradualmente
@@ -269,6 +294,7 @@ def main_menu():
     while True:
         # Exibe o menu apenas uma vez
         os.system('cls')
+  
         print("\033[38;5;3m╔═══════════════════════════╗\033[0m")
         print("\033[38;5;3m║                           ║\033[0m")
         print("\033[38;5;3m║           \033[38;5;11mMENU\033[0m            \033[38;5;3m║\033[0m")
@@ -279,7 +305,7 @@ def main_menu():
         print("\033[38;5;3m║    ║   \033[38;5;11m2.Pontuação\033[0m   \033[38;5;3m║\033[0m    \033[38;5;3m║\033[0m")
         print("\033[38;5;3m║    ╚═════════════════╝    ║\033[0m")
         print("\033[38;5;3m║    ╔═════════════════╗    ║\033[0m")
-        print("\033[38;5;3m║    ║   \033[38;5;11m3.Instrução\033[0m   \033[38;5;3m║\033[0m    \033[38;5;3m║\033[0m")
+        print("\033[38;5;3m║    ║  \033[38;5;11m3.Como jogar?\033[0m  \033[38;5;3m║\033[0m    \033[38;5;3m║\033[0m")
         print("\033[38;5;3m║    ╚═════════════════╝    ║\033[0m")
         print("\033[38;5;3m║    ╔═════════════════╗    ║\033[0m")
         print("\033[38;5;3m║    ║      \033[38;5;11m4.Sair\033[0m     \033[38;5;3m║\033[0m    \033[38;5;3m║\033[0m")
@@ -324,21 +350,25 @@ def main_menu():
 
         elif tecla == '3':
             os.system('cls')
-            print("\033[38;5;3m╔═════════════════════════════════╗\033[0m")
-            print("\033[38;5;3m║                                 ║\033[0m")
-            print("\033[38;5;3m║   Voe o máximo que conseguir,   ║\033[0m")  
-            print("\033[38;5;3m║      evitando obstáculos        ║\033[0m")
-            print("\033[38;5;3m║     e coletando gasolina.       ║\033[0m")
-            print("\033[38;5;3m║                                 ║\033[0m")
-            print("\033[38;5;3m║    Você perde se colidir com    ║\033[0m")
-            print("\033[38;5;3m║         um obstáculo ou         ║\033[0m")
-            print("\033[38;5;3m║   quando o combustível acabar   ║\033[0m")
-            print("\033[38;5;3m║                                 ║\033[0m")
-            print("\033[38;5;3m║  Controle:A para ir a esquerda  ║\033[0m") 
-            print("\033[38;5;3m║           D para ir a direita   ║\033[0m") 
-            print("\033[38;5;3m║           P para pausar o jogo  ║\033[0m")
-            print("\033[38;5;3m║                                 ║\033[0m")   
-            print("\033[38;5;3m╚═════════════════════════════════╝\033[0m")
+            print("\033[38;5;3m╔═══════════════════════════════════════════════════════════════╗\033[0m")
+            print("\033[38;5;3m║                                                               ║\033[0m")
+            print("\033[38;5;3m║  Voe o máximo que conseguir,                                  ║\033[0m")  
+            print("\033[38;5;3m║  evitando obstáculos e                     __/\__             ║\033[0m")
+            print("\033[38;5;3m║  coletando gasolina.                      `==/\==`            ║\033[0m")
+            print("\033[38;5;3m║                                 ____________/__\____________  ║\033[0m")
+            print("\033[38;5;3m║  Você perde se colidir com     /____________________________\ ║\033[0m")
+            print("\033[38;5;3m║  um obstáculo ou                 __||__||__/.--.\__||__||_    ║\033[0m")
+            print("\033[38;5;3m║  quando o combustível acabar.   /__|___|___( >< )___|___|__\  ║\033[0m")
+            print("\033[38;5;3m║                                           _/`--`\_            ║\033[0m")
+            print("\033[38;5;3m║  Controles:                              (/------\)           ║\033[0m")
+            print("\033[38;5;3m║                                                               ║\033[0m") 
+            print("\033[38;5;3m║  [D] Direita           _ .                                    ║\033[0m") 
+            print("\033[38;5;3m║  [A] Esquerda        (  _ )_                   _              ║\033[0m")
+            print("\033[38;5;3m║  [W] Atirar         (_  _(_ ,)                (  )            ║\033[0m")  
+            print("\033[38;5;3m║  [ESC] Pausar                              ( `  ) . )         ║\033[0m")
+            print("\033[38;5;3m║                                           (_, _(  ,_)_)       ║\033[0m")
+            print("\033[38;5;3m║                                                               ║\033[0m")   
+            print("\033[38;5;3m╚═══════════════════════════════════════════════════════════════╝\033[0m")
             print("")
             print("Pressione Enter para voltar ao menu...")
             
