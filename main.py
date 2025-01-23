@@ -193,7 +193,7 @@ def tela_de_pause():
             else: 
                 print('Opção inválida.')
 
-    return False
+            return False
     
 # Parte principal do programa
 def jogar():
