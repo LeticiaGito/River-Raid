@@ -8,7 +8,7 @@ import json
 #configurações dos elementos de jogo
 VAZIO = " "  # Espaço vazio
 RIO = "\033[38;5;33m█\033[0m"  # Rio com a cor azul
-AVIAO = "\033[48;5;196m█\033[0m"  
+AVIAO = "\033[48;42;47m■\033[0m"  # Avião em branco e cinza
 OBSTACULO = "\033[48;5;196m■\033[0m"  # Obstáculo em vermelho
 COMBUSTIVEL = "\033[48;5;226m▲\033[0m"  # Combustível em amarelo
 
@@ -113,15 +113,21 @@ def detectar_colisao():
     global pontuacao, combustivel
     colidiu = False
 
-    for deslocamento_x in [-1, 0, 1]:
+    for deslocamento_x in [-1, 0, 1]:    # Verifica a área ao redor do avião
         for deslocamento_y in [-1, 0, 1]:
             pos_x = aviao_coluna + deslocamento_x
             pos_y = aviao_linha + deslocamento_y
-            if 0 <= pos_x < coluna and 0 <= pos_y < linha:
-                if matriz[pos_y][pos_x] == OBSTACULO:
+            
+            if 0 <= pos_x < coluna and 0 <= pos_y < linha:    #Verifica se a posição está fora da matriz (Colisão com a borda do mapa)
+                if not (0 <= pos_x < coluna and 0 <= pos_y < linha):
+                    print("Game over! Que pena, você colidiu com a margem do rio!")
+                    return True
+                    
+                if matriz[pos_y][pos_x] == OBSTACULO: # Verifica se há um obstáculo
                     print("Game Over! Que pena, você colidiu com um obstáculo!")
-                    colidiu = True
-                elif matriz[pos_y][pos_x] == COMBUSTIVEL:
+                    return True
+                    
+                if matriz[pos_y][pos_x] == COMBUSTIVEL: # Verifica se há combustível
                     pontuacao += 10
                     combustivel = min(combustivel + 20, 100)  # Evita que o combustível ultrapasse 100
                     matriz[aviao_linha][aviao_coluna] = RIO  # Remove o combustível após coleta
