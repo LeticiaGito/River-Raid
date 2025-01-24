@@ -305,8 +305,37 @@ def jogar():
     limparTela(matriz) #limpar a tela sem piscar
     return pontuacao  #retorna a pontuação final
 
-#menu
+#menu principal
 def main_menu():
+    capa = ["""
+██████╗ ██╗██╗   ██╗███████╗██████╗      
+██╔══██╗██║██║   ██║██╔════╝██╔══██╗    
+██████╔╝██║██║   ██║█████╗  ██████╔╝    
+██╔══██╗██║╚██╗ ██╔╝██╔══╝  ██╔══██╗    
+██║  ██║██║ ╚████╔╝ ███████╗██║  ██║    
+╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝     
+
+     ██████╗  █████╗ ██╗██████╗
+     ██╔══██╗██╔══██╗██║██╔══██╗
+     ██████╔╝███████║██║██║  ██║
+     ██╔══██╗██╔══██║██║██║  ██║
+     ██║  ██║██║  ██║██║██████╔╝
+     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═════╝
+    """]
+
+    #faz o efeito de digitação da frase
+    frase = capa [0]
+    for i in list(frase):
+        print(i, end='', flush=True)
+        time.sleep(0.004)
+
+    print("Pressione Enter para ir ao menu...")
+            
+    while True:
+        if WConio2.kbhit():
+            _, tecla = WConio2.getch()
+            if tecla == '\r':  
+                 break
     while True:
         # Exibe o menu apenas uma vez
         os.system('cls')
@@ -357,6 +386,7 @@ def main_menu():
                 print("Sua pontuação não foi salva.")
     
             # Aguardar o Enter para voltar ao menu
+            print("")
             print("Pressione Enter para voltar ao menu...")
             while True:
                 if WConio2.kbhit():
@@ -369,6 +399,7 @@ def main_menu():
             exibir_pontuacoes()
 
             # Aguardar o Enter para voltar ao menu
+            print("")
             print("Pressione Enter para voltar ao menu...")
             while True:
                 if WConio2.kbhit():
@@ -381,14 +412,14 @@ def main_menu():
             print("\033[38;5;3m╔═══════════════════════════════════════════════════════════════╗\033[0m")
             print("\033[38;5;3m║                                                               ║\033[0m")
             print("\033[38;5;3m║  Voe o máximo que conseguir,                                  ║\033[0m")  
-            print("\033[38;5;3m║  evitando obstáculos e                     __/\__             ║\033[0m")
-            print("\033[38;5;3m║  coletando gasolina.                      `==/\==`            ║\033[0m")
-            print("\033[38;5;3m║                                 ____________/__\____________  ║\033[0m")
-            print("\033[38;5;3m║  Você perde se colidir com     /____________________________\ ║\033[0m")
-            print("\033[38;5;3m║  um obstáculo ou                 __||__||__/.--.\__||__||_    ║\033[0m")
-            print("\033[38;5;3m║  quando o combustível acabar.   /__|___|___( >< )___|___|__\  ║\033[0m")
-            print("\033[38;5;3m║                                           _/`--`\_            ║\033[0m")
-            print("\033[38;5;3m║  Controles:                              (/------\)           ║\033[0m")
+            print("\033[38;5;3m║  evitando obstáculos e                    __/\\__             ║\033[0m")
+            print("\033[38;5;3m║  coletando gasolina.                     `==/\\==`            ║\033[0m")
+            print("\033[38;5;3m║                                ____________/__\\____________  ║\033[0m")
+            print("\033[38;5;3m║  Você perde se colidir com    /____________________________\\ ║\033[0m")
+            print("\033[38;5;3m║  um obstáculo ou                __||__||__/.--.\\__||__||_    ║\033[0m")
+            print("\033[38;5;3m║  quando o combustível acabar.  /__|___|___( >< )___|___|__\\  ║\033[0m")
+            print("\033[38;5;3m║                                          _/`--`\\_            ║\033[0m")
+            print("\033[38;5;3m║  Controles:                             (/------\\)           ║\033[0m")
             print("\033[38;5;3m║                                                               ║\033[0m") 
             print("\033[38;5;3m║  [D] Direita           _ .                                    ║\033[0m") 
             print("\033[38;5;3m║  [A] Esquerda        (  _ )_                   _              ║\033[0m")
