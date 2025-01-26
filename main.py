@@ -11,15 +11,15 @@ import re
 #configurações dos elementos de jogo
 VAZIO = " "  # Espaço vazio
 RIO = "\033[38;5;33m█\033[0m"  # Rio com a cor azul
-AVIAO = "\033[38;5;16m\033[48;5;33m▲\033[0m"
+AVIAO = "\033[38;5;16m\033[48;5;33m▲\033[0m"  # Avião em branco e cinza
 OBSTACULO = "\033[48;5;196m■\033[0m"  # Obstáculo em vermelho
 COMBUSTIVEL = "\033[48;5;226m▲\033[0m"  # Combustível em amarelo
 
 #dimensões do mapa no jogo
 linha = 20
 coluna = 25
-aviao_linha = 8 #Posição do avião linha
-aviao_coluna = 12  # Posição do avião coluna
+aviao_linha = linha - 3 #Posição do avião linha
+aviao_coluna = coluna // 2  # Posição do avião coluna
 matriz = []
 
 #Variáveis do jogo
@@ -72,15 +72,16 @@ def carregar_pontuacoes():
     return []
 
 #função para salvar uma nova pontuação
-def salvar_pontuacao(nome_jogador, pontuacao_final):
+def salvar_pontuacao(nome_jogador, pontuacao_final, tempo_final):
     pontuacoes = carregar_pontuacoes()
-    pontuacoes.append({"nome": nome_jogador, "pontuacao": pontuacao_final})
+    pontuacoes.append({
+        "nome": nome_jogador,
+        "pontuacao": pontuacao_final,
+        "tempo": tempo_final
+    })
 
-    #filtra pontuações válidas
-    pontuacoes = [pontuacao for pontuacao in pontuacoes if pontuacao.get("pontuacao") is not None]
-
-    #ordena as pontuações
-    pontuacoes = sorted(pontuacoes, key=lambda x: x["pontuacao"], reverse=True)
+    # Ordena as pontuações por pontuação, e depois por tempo como critério secundário
+    pontuacoes = sorted(pontuacoes, key=lambda x: (x["pontuacao"], -x["tempo"]), reverse=True)
 
     # Salva as pontuações ordenadas no arquivo
     with open(arquivo_pontuacao, "w") as arquivo:
@@ -92,18 +93,24 @@ def exibir_pontuacoes():
 
     # Cabeçalho "Pontuações" mais próximo do topo
     pontuacao_display = '''
-\033[38;5;208m╔══════════════════════════════════════╗\033[38;5;208m
-\033[38;5;208m║                Pontuação             ║\033[38;5;208m
-\033[38;5;208m╚══════════════════════════════════════╝\033[38;5;208m'''
-    centralizar_texto(pontuacao_display, margem_superior=10)  # Ajuste a margem_superior conforme necessário
+\033[38;5;11m╔═════════════════════════════════════════════════════════╗\033[0m
+\033[38;5;11m║                       Pontuações                        ║\033[0m
+\033[38;5;11m╚═════════════════════════════════════════════════════════╝\033[0m'''
+    centralizar_texto(pontuacao_display, margem_superior=11)  # Ajuste a margem_superior conforme necessário
 
     # Largura do terminal
     largura_terminal = shutil.get_terminal_size().columns
-    margem_lateral = max(0, (largura_terminal - 40) // 2)
+    margem_lateral = max(0, (largura_terminal - 60) // 2)
 
     if pontuacoes:
+        print(' ')
+        print(" " * margem_lateral + f"{'Pos.':<5}{'Jogador':<20}{'Pontuação':<15}{'Tempo(s)':<10}")
+        print(" " * margem_lateral + "-" * 60)
         for rank, entrada in enumerate(pontuacoes, start=1):
-            print(" " * margem_lateral + f"{rank}. {entrada['nome']} - {entrada['pontuacao']}")
+            nome = entrada['nome']
+            pontos = entrada['pontuacao']
+            tempo = entrada['tempo']
+            print(" " * margem_lateral + f"{rank:<5}{nome:<20}{pontos:<15}{tempo:<10}")
     else:
         print(" " * margem_lateral + "Nenhuma pontuação salva ainda!")
 
@@ -132,6 +139,10 @@ def limpar_posicao():
             pos_y = aviao_linha + deslocamento_y
             if 0 <= pos_x < coluna and 0 <= pos_y <linha:
                  matriz[pos_y][pos_x] = RIO
+
+#limpa a antiga posição do avião antes de redesenhar
+def limpar_posicao():
+    matriz[aviao_linha][aviao_coluna] = RIO
 
 #Desenha o avião na nova posição 
 def desenhar_aviao():
@@ -205,49 +216,49 @@ def detectar_colisao():
 
 # Função para exibir a tela de "Game Over"
 def tela_game_over(motivo):
+    global pontuacao, inicio_tempo, tempo_pausado
     os.system('cls' if os.name == 'nt' else 'clear')  # Limpa a tela
+    tempo_final = int(time.time() - inicio_tempo - tempo_pausado)  # Calcula o tempo jogado
     game_over_message = f'''
-\033[38;5;3m╔══════════════════════════════════════╗\033[0m
-\033[38;5;3m║               GAME OVER              ║\033[0m
-\033[38;5;3m╚══════════════════════════════════════╝\033[0m
+\033[38;5;11m╔══════════════════════════════════════╗\033[0m
+\033[38;5;11m║               GAME OVER              ║\033[0m
+\033[38;5;11m╚══════════════════════════════════════╝\033[0m
 
-   >> \033[38;5;15m{motivo.center(28)}\033[0m <<  \033[38;5;9m
+   \033[38;5;214m>> {motivo.center(28)}\033[38;5;214m <<  \033[38;5;9m
 
     '''
     centralizar_texto(game_over_message, margem_superior=5)  # Centraliza a mensagem de Game Over
 
-    # Exibe a pontuação final centralizada
-    centralizar_texto(f"\033[38;5;226mPontuação Final: {pontuacao}\033[0m", margem_superior=15)
+    # Exibe a pontuação final e tempo jogado centralizados
+    centralizar_texto(f"\033[38;5;226mPontuação Final: {pontuacao} | Tempo Final: {tempo_final}s\033[0m", margem_superior=15)
     print(' ')
     # Pergunta se deseja salvar
-    salvar_opcao = input("                                          Deseja salvar sua pontuação? (s/n): ").strip().lower()
+    salvar_opcao = input("                                          \033[1;37mDeseja salvar sua pontuação? (s/n): ").strip().lower()
     while salvar_opcao not in ['s', 'n']:
-        #print("Opção inválida. Digite 's' para sim ou 'n' para não.")
         salvar_opcao = input("Deseja salvar sua pontuação? (s/n): ").strip().lower()
 
     if salvar_opcao == "s":
         nome_jogador = input("\n                                          Digite seu nome: ")
-        salvar_pontuacao(nome_jogador, pontuacao)
+        salvar_pontuacao(nome_jogador, pontuacao, tempo_final)
         print("\n                                          \033[38;5;40mPontuação salva com sucesso!\033[38;5;40m")
     else:
-        print("\n                                          \033[31mSua pontuação não foi salva.\033[31m")
+        print("\n                                          \033[1;31mSua pontuação não foi salva.\033[1;31m")
 
     # Aguardar o Enter para voltar ao menu
-    print("\n\n\n\n                                          \033[37mPressione Enter para voltar ao menu...\033[37m")
+    centralizar_texto('\033[37mPressione Enter para voltar ao menu...\033[37m', margem_superior=6)
     while True:
         if WConio2.kbhit():
             _, tecla = WConio2.getch()
             if tecla == '\r':  # Verifica se a tecla pressionada é "Enter"
                 main_menu()  # Sai do loop e retorna ao menu
  
-
 # Imprime a tela do jogo
 def delimitacao(matriz):
     margem_superior, margem_lateral = centralizar()
     tempo_jogado = time.time() - inicio_tempo - tempo_pausado #calcula o tempo 
     print('\n' * (margem_superior - 1), end='')  # Ajusta a margem superior para subir a pontuação
     print(' ' * margem_lateral, end=' ')
-    print(f"\033[38;5;226mPontuação: {pontuacao} | Combustível: {combustivel:.1f}| Tempo: {int(tempo_jogado)}s\033[0m".center(coluna + 8))
+    centralizar_texto(f"\n    \033[38;5;226mPontuação: {pontuacao} | Combustível: {combustivel:.1f}| Tempo: {int(tempo_jogado)}s\033[0m", margem_superior= 14)
     print(' ' * margem_lateral, end=' ')
     print(" ")  # Linha separadora
 
@@ -261,7 +272,7 @@ def delimitacao(matriz):
 
 # Função para reiniciar o estado do jogo
 def reiniciar_jogo():
-    global pontuacao, combustivel, relogio, aviao_linha, aviao_coluna, matriz, inicio_tempo, velocidade, nivel_dificuldade
+    global pontuacao, combustivel, relogio, aviao_linha, aviao_coluna, matriz, inicio_tempo
 
     # Reinicia as variáveis do jogo
     pontuacao = 0
@@ -273,12 +284,8 @@ def reiniciar_jogo():
     # Reinicia a matriz (preenchendo com o rio)
     matriz = [[RIO] * coluna for _ in range(linha)]
 
-    #reinicia  o cronometro 
+    #reinicia o o cronometro 
     inicio_tempo = time.time()
-
-    #Reincia a dificuldade do jogo e a velocidade 
-    nivel_dificuldade = 1
-    velocidade = 0.1
 
 # Inicialização da matriz
 for i in range(linha):
@@ -295,18 +302,18 @@ def tela_de_pause():
     os.system('cls' if os.name == 'nt' else 'clear') # Limpa a tela
 
     pause = '''    
-\033[38;5;3m╔═══════════════════════════╗\033[0m
-\033[38;5;3m║                           ║\033[0m
-                            \033[38;5;3m║\033[0m        \033[38;5;11mJOGO PAUSADO\033[0m     \033[38;5;3m  ║\033[0m
-\033[38;5;3m║                           ║\033[0m
-\033[38;5;3m║   ╔═══════════════════╗   ║\033[0m
-\033[38;5;3m║   ║\033[0m   \033[38;5;11m1.Retomar jogo\033[0m\033[38;5;3m  ║   ║\033[0m
-\033[38;5;3m║   ╚═══════════════════╝   ║\033[0m
-\033[38;5;3m║   ╔═══════════════════╗   ║\033[0m
-\033[38;5;3m║   ║\033[0m       \033[38;5;11m2.Sair\033[0m      \033[38;5;3m║   ║\033[0m
-\033[38;5;3m║   ╚═══════════════════╝   ║\033[0m
-\033[38;5;3m║                           ║\033[0m
-\033[38;5;3m╚═══════════════════════════╝\033[0m'''
+\033[38;5;11m╔═══════════════════════════╗\033[0m
+\033[38;5;11m║                           ║\033[0m
+\033[38;5;11m║\033[0m        \033[38;5;11mJOGO PAUSADO\033[0m     \033[38;5;11m  ║\033[0m
+\033[38;5;11m║                           ║\033[0m
+\033[38;5;11m║   ╔═══════════════════╗   ║\033[0m
+\033[38;5;11m║   ║\033[0m   \033[38;5;11m1.Retomar jogo\033[0m\033[38;5;11m  ║   ║\033[0m
+\033[38;5;11m║   ╚═══════════════════╝   ║\033[0m
+\033[38;5;11m║   ╔═══════════════════╗   ║\033[0m
+\033[38;5;11m║   ║\033[0m       \033[38;5;11m2.Sair\033[0m      \033[38;5;11m║   ║\033[0m
+\033[38;5;11m║   ╚═══════════════════╝   ║\033[0m
+\033[38;5;11m║                           ║\033[0m
+\033[38;5;11m╚═══════════════════════════╝\033[0m'''
 
     centralizar_texto(pause)
 
@@ -315,7 +322,7 @@ def tela_de_pause():
             _, tecla = WConio2.getch()
             if tecla in ['1']:
                 pausado = False
-            
+
                 # Atualiza o tempo acumulado com o período de pausa
                 tempo_pausado += time.time() - inicio_tempo_pausa
                 inicio_tempo_pausa = None
@@ -325,9 +332,7 @@ def tela_de_pause():
                 return True
         
             else: 
-                print('Opção inválida.')
-
-            return False
+                centralizar_texto('Opção inválida! Digite [1] ou [2].', margem_superior= 8)
 
 def animacao_explosao():
     explosao_frames = [
@@ -362,6 +367,8 @@ def jogar():
     nivel_dificuldade = 1
     inicio_tempo = time.time()
     inicio_tempo = time.time()
+
+    os.system('cls' if os.name == 'nt' else 'clear')
 
     while True:
         if pausado:
@@ -420,27 +427,32 @@ def jogar():
 
 def exibir_capa():
     capa = ["""
-                                            ██████╗ ██╗██╗   ██╗███████╗██████╗      
-                                            ██╔══██╗██║██║   ██║██╔════╝██╔══██╗    
-                                            ██████╔╝██║██║   ██║█████╗  ██████╔╝    
-                                            ██╔══██╗██║╚██╗ ██╔╝██╔══╝  ██╔══██╗    
-                                            ██║  ██║██║ ╚████╔╝ ███████╗██║  ██║    
-                                            ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝     
 
-                                                ██████╗  █████╗ ██╗██████╗
-                                                ██╔══██╗██╔══██╗██║██╔══██╗
-                                                ██████╔╝███████║██║██║  ██║
-                                                ██╔══██╗██╔══██║██║██║  ██║
-                                                ██║  ██║██║  ██║██║██████╔╝
-                                                ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═════╝
+
+
+
+
+                                            \033[38;5;11m██████╗ ██╗██╗   ██╗███████╗██████╗\033[38;5;11m      
+                                            \033[38;5;11m██╔══██╗██║██║   ██║██╔════╝██╔══██╗\033[38;5;11m    
+                                            \033[38;5;11m██████╔╝██║██║   ██║█████╗  ██████╔╝\033[38;5;11m    
+                                            \033[38;5;11m██╔══██╗██║╚██╗ ██╔╝██╔══╝  ██╔══██╗\033[38;5;11m    
+                                            \033[38;5;11m██║  ██║██║ ╚████╔╝ ███████╗██║  ██║\033[38;5;11m    
+                                            \033[38;5;11m╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝\033[38;5;11m     
+                                                \033[38;5;11m██████╗  █████╗ ██╗██████╗\033[38;5;11m
+                                                \033[38;5;11m██╔══██╗██╔══██╗██║██╔══██╗\033[38;5;11m
+                                                \033[38;5;11m██████╔╝███████║██║██║  ██║\033[38;5;11m
+                                                \033[38;5;11m██╔══██╗██╔══██║██║██║  ██║\033[38;5;11m
+                                                \033[38;5;11m██║  ██║██║  ██║██║██████╔╝\033[38;5;11m
+                                                \033[38;5;11m╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═════╝\033[38;5;11m
 """]
+
     #faz o efeito de digitação da frase
     frase = capa [0]
     for i in list(frase):
         print(i, end='', flush=True)
         time.sleep(0.004)
 
-    print("\nPressione Enter para ir ao menu...")
+    centralizar_texto("\n\033[37mPressione Enter para ir ao menu...\n\033[37m", margem_superior= 8)
             
     while True:
         if WConio2.kbhit():
@@ -456,23 +468,23 @@ def main_menu():
         os.system('cls')
   
         menu = '''
-\033[38;5;3m╔═══════════════════════════╗\033[0m
-\033[38;5;3m║                           ║\033[0m
-\033[38;5;3m║           \033[38;5;11mMENU\033[0m            \033[38;5;3m║\033[0m
-\033[38;5;3m║    ╔═════════════════╗    ║\033[0m
-\033[38;5;3m║    ║     \033[38;5;11m1.Jogar\033[0m     \033[38;5;3m║\033[0m    \033[38;5;3m║\033[0m
-\033[38;5;3m║    ╚═════════════════╝    ║\033[0m
-\033[38;5;3m║    ╔═════════════════╗    ║\033[0m
-\033[38;5;3m║    ║   \033[38;5;11m2.Pontuação\033[0m   \033[38;5;3m║\033[0m    \033[38;5;3m║\033[0m
-\033[38;5;3m║    ╚═════════════════╝    ║\033[0m
-\033[38;5;3m║    ╔═════════════════╗    ║\033[0m
-\033[38;5;3m║    ║  \033[38;5;11m3.Como jogar?\033[0m  \033[38;5;3m║\033[0m    \033[38;5;3m║\033[0m
-\033[38;5;3m║    ╚═════════════════╝    ║\033[0m
-\033[38;5;3m║    ╔═════════════════╗    ║\033[0m
-\033[38;5;3m║    ║      \033[38;5;11m4.Sair\033[0m     \033[38;5;3m║\033[0m    \033[38;5;3m║\033[0m
-\033[38;5;3m║    ╚═════════════════╝    ║\033[0m
-\033[38;5;3m║                           ║\033[0m
-\033[38;5;3m╚═══════════════════════════╝\033[0m
+\033[38;5;11m╔═══════════════════════════╗\033[0m
+\033[38;5;11m║                           ║\033[0m
+\033[38;5;11m║           \033[38;5;11mMENU\033[0m            \033[38;5;11m║\033[0m
+\033[38;5;11m║    ╔═════════════════╗    ║\033[0m
+\033[38;5;11m║    ║     \033[38;5;11m1.Jogar\033[0m     \033[38;5;11m║\033[0m    \033[38;5;11m║\033[0m
+\033[38;5;11m║    ╚═════════════════╝    ║\033[0m
+\033[38;5;11m║    ╔═════════════════╗    ║\033[0m
+\033[38;5;11m║    ║   \033[38;5;11m2.Pontuações\033[0m  \033[38;5;11m║\033[0m    \033[38;5;11m║\033[0m
+\033[38;5;11m║    ╚═════════════════╝    ║\033[0m
+\033[38;5;11m║    ╔═════════════════╗    ║\033[0m
+\033[38;5;11m║    ║  \033[38;5;11m3.Como jogar?\033[0m  \033[38;5;11m║\033[0m    \033[38;5;11m║\033[0m
+\033[38;5;11m║    ╚═════════════════╝    ║\033[0m
+\033[38;5;11m║    ╔═════════════════╗    ║\033[0m
+\033[38;5;11m║    ║      \033[38;5;11m4.Sair\033[0m     \033[38;5;11m║\033[0m    \033[38;5;11m║\033[0m
+\033[38;5;11m║    ╚═════════════════╝    ║\033[0m
+\033[38;5;11m║                           ║\033[0m
+\033[38;5;11m╚═══════════════════════════╝\033[0m
         '''
 
         centralizar_texto(menu)
@@ -496,7 +508,7 @@ def main_menu():
             exibir_pontuacoes()
 
             # Aguardar o Enter para voltar ao menu
-            centralizar_texto(f"\nPressione Enter para voltar ao menu", margem_superior=15)
+            centralizar_texto(f"\n\033[37mPressione Enter para voltar ao menu\033[37m", margem_superior=1)
             while True:
                 if WConio2.kbhit():
                     _, tecla = WConio2.getch()
@@ -506,27 +518,27 @@ def main_menu():
         elif tecla == '3':
             os.system('cls')
             instrucoes = '''            
-\033[38;5;3m╔═══════════════════════════════════════════════════════════════╗\033[38;5;3m
-\033[38;5;3m║                                                               ║\033[38;5;3m
- \033[38;5;3m║  Voe o máximo que conseguir,                                  ║\033[38;5;3m 
-\033[38;5;3m║  evitando obstáculos e                     __/\__             ║\033[38;5;3m
-\033[38;5;3m║  coletando gasolina.                      `==/\==`            ║\033[38;5;3m
-\033[38;5;3m║                                 ____________/__\____________  ║\033[38;5;3m
-\033[38;5;3m║  Você perde se colidir com     /____________________________\ ║\033[38;5;3m
-\033[38;5;3m║  um obstáculo ou                 __||__||__/.--.\__||__||_    ║\033[38;5;3m
-\033[38;5;3m║  quando o combustível acabar.   /__|___|___( >< )___|___|__\  ║\033[38;5;3m
-\033[38;5;3m║                                           _/`--`\_            ║\033[38;5;3m
-\033[38;5;3m║  Controles:                              (/------\)           ║\033[38;5;3m
-\033[38;5;3m║                                                               ║\033[38;5;3m 
-\033[38;5;3m║  [D] Direita           _ .                                    ║\033[38;5;3m
-\033[38;5;3m║  [A] Esquerda        (  _ )_                   _              ║\033[38;5;3m
-\033[38;5;3m║  [W] Atirar         (_  _(_ ,)                (  )            ║\033[38;5;3m
-\033[38;5;3m║  [ESC] Pausar                              ( `  ) . )         ║\033[38;5;3m
-\033[38;5;3m║                                           (_, _(  ,_)_)       ║\033[38;5;3m
-\033[38;5;3m║                                                               ║\033[38;5;3m  
-\033[38;5;3m╚═══════════════════════════════════════════════════════════════╝\033[38;5;3m
+\033[38;5;11m╔═══════════════════════════════════════════════════════════════╗\033[38;5;11m
+\033[38;5;11m║                                                               ║\033[38;5;11m
+ \033[38;5;11m║  Voe o máximo que conseguir,                                  ║\033[38;5;11m 
+\033[38;5;11m║  evitando obstáculos e                     __/\__             ║\033[38;5;11m
+\033[38;5;11m║  coletando gasolina.                      `==/\==`            ║\033[38;5;11m
+\033[38;5;11m║                                 ____________/__\____________  ║\033[38;5;11m
+\033[38;5;11m║  Você perde se colidir com     /____________________________\ ║\033[38;5;11m
+\033[38;5;11m║  um obstáculo ou                 __||__||__/.--.\__||__||_    ║\033[38;5;11m
+\033[38;5;11m║  quando o combustível acabar.   /__|___|___( >< )___|___|__\  ║\033[38;5;11m
+\033[38;5;11m║                                           _/`--`\_            ║\033[38;5;11m
+\033[38;5;11m║  Controles:                              (/------\)           ║\033[38;5;11m
+\033[38;5;11m║                                                               ║\033[38;5;11m 
+\033[38;5;11m║  [D] Direita           _ .                                    ║\033[38;5;11m
+\033[38;5;11m║  [A] Esquerda        (  _ )_                   _              ║\033[38;5;11m
+\033[38;5;11m║  [W] Atirar         (_  _(_ ,)                (  )            ║\033[38;5;11m
+\033[38;5;11m║  [ESC] Pausar                              ( `  ) . )         ║\033[38;5;11m
+\033[38;5;11m║                                           (_, _(  ,_)_)       ║\033[38;5;11m
+  \033[38;5;11m║                                                               ║\033[38;5;11m  
+\033[38;5;11m╚═══════════════════════════════════════════════════════════════╝\033[38;5;3m
             
-Pressione Enter para voltar ao menu...'''
+\033[37mPressione Enter para voltar ao menu...\033[37m'''
             centralizar_texto(instrucoes)
 
             while True:
@@ -536,7 +548,7 @@ Pressione Enter para voltar ao menu...'''
                         break
 
         elif tecla == '4':  # Sair
-            print("Saindo do jogo. Até logo!")
+            centralizar_texto("\033[37mSaindo do jogo. Até logo!\033[37m", margem_superior= 14)
             break  # Encerra o loop principal e sai do programa
 
 #iniciar o menu
