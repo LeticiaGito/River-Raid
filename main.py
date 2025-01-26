@@ -29,6 +29,7 @@ velocidade = 0.1 #velocidade inicial do jogo
 pontuacao = 0 
 pausado = False
 nivel_dificuldade = 1
+tempo_pausado = 0
 
 #arquivo que salva as pontuações
 arquivo_pontuacao = "pontuacao.json"
@@ -289,6 +290,7 @@ def tela_de_pause():
 
     #Marca o inicio do tempo de pause 
     inicio_tempo_pausa = time.time()
+    pausado = True
     
     os.system('cls' if os.name == 'nt' else 'clear') # Limpa a tela
 
@@ -358,8 +360,8 @@ def jogar():
     reiniciar_jogo()
     cursor.hide()
     nivel_dificuldade = 1
-     inicio_tempo = time.time()
-     inicio_tempo = time.time()
+    inicio_tempo = time.time()
+    inicio_tempo = time.time()
 
     while True:
         if pausado:
