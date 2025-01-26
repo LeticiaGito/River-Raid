@@ -269,7 +269,7 @@ def delimitacao(matriz):
 
 # Função para reiniciar o estado do jogo
 def reiniciar_jogo():
-    global pontuacao, combustivel, relogio, aviao_linha, aviao_coluna, matriz, inicio_tempo
+    global pontuacao, combustivel, relogio, aviao_linha, aviao_coluna, matriz, inicio_tempo, velocidade, nivel_dificuldade
 
     # Reinicia as variáveis do jogo
     pontuacao = 0
@@ -281,8 +281,12 @@ def reiniciar_jogo():
     # Reinicia a matriz (preenchendo com o rio)
     matriz = [[RIO] * coluna for _ in range(linha)]
 
-    #reinicia o o cronometro 
+    #reinicia  o cronometro 
     inicio_tempo = time.time()
+
+    #Reincia a dificuldade do jogo e a velocidade 
+    nivel_dificuldade = 1
+    velocidade = 0.1
 
 # Inicialização da matriz
 for i in range(linha):
