@@ -136,14 +136,6 @@ def limpar_posicao():
 #Desenha o avião na nova posição 
 def desenhar_aviao():
     matriz[aviao_linha][aviao_coluna] = AVIAO
-    if aviao_coluna + 1 < coluna:
-        matriz[aviao_linha][aviao_coluna + 1] = AVIAO
-    if aviao_coluna - 1 >= 0:
-        matriz[aviao_linha][aviao_coluna - 1] = AVIAO
-    if aviao_linha - 1 >= 0:
-        matriz[aviao_linha - 1][aviao_coluna] = AVIAO
-    if aviao_linha + 1 < linha:
-        matriz[aviao_linha + 1][aviao_coluna] = AVIAO
 
 # Move os obstáculos para baixo e remove os que saírem da tela
 def mover_obstaculos():
