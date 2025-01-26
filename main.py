@@ -133,13 +133,17 @@ def limpar_posicao():
             if 0 <= pos_x < coluna and 0 <= pos_y <linha:
                  matriz[pos_y][pos_x] = RIO
 
-#limpa a antiga posição do avião antes de redesenhar
-def limpar_posicao():
-    matriz[aviao_linha][aviao_coluna] = RIO
-
 #Desenha o avião na nova posição 
 def desenhar_aviao():
     matriz[aviao_linha][aviao_coluna] = AVIAO
+    if aviao_coluna + 1 < coluna:
+        matriz[aviao_linha][aviao_coluna + 1] = AVIAO
+    if aviao_coluna - 1 >= 0:
+        matriz[aviao_linha][aviao_coluna - 1] = AVIAO
+    if aviao_linha - 1 >= 0:
+        matriz[aviao_linha - 1][aviao_coluna] = AVIAO
+    if aviao_linha + 1 < linha:
+        matriz[aviao_linha + 1][aviao_coluna] = AVIAO
 
 # Move os obstáculos para baixo e remove os que saírem da tela
 def mover_obstaculos():
@@ -523,7 +527,7 @@ def main_menu():
 \033[38;5;3m║  [W] Atirar         (_  _(_ ,)                (  )            ║\033[38;5;3m
 \033[38;5;3m║  [ESC] Pausar                              ( `  ) . )         ║\033[38;5;3m
 \033[38;5;3m║                                           (_, _(  ,_)_)       ║\033[38;5;3m
-  \033[38;5;3m║                                                               ║\033[38;5;3m  
+\033[38;5;3m║                                                               ║\033[38;5;3m  
 \033[38;5;3m╚═══════════════════════════════════════════════════════════════╝\033[38;5;3m
             
 Pressione Enter para voltar ao menu...'''
