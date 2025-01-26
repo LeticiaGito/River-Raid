@@ -106,6 +106,17 @@ def exibir_pontuacoes():
     else:
         print(" " * margem_lateral + "Nenhuma pontuação salva ainda!")
 
+# Atualiza a pontuação com base no tempo
+def atualizar_pontuacao():
+    global pontuacao, inicio_tempo
+    tempo_jogado = int(time.time() - inicio_tempo)  # Tempo em segundos
+    if tempo_jogado <= 30:
+        pontuacao = tempo_jogado * 10  # 10 ponto por segundo até 30 segundos
+    elif tempo_jogado <= 60:
+        pontuacao = 30 + (tempo_jogado - 30) * 15  # 15 pontos por segundo de 31 a 60 segundos
+    else:
+        pontuacao = 90 + (tempo_jogado - 60) * 20  # 20 pontos por segundo a partir de 61 segundos
+
 #limpa a matriz preenchendo todos os valores com o símbolo do rio.
 def limparTela(matriz): 
     for i in range(linha):
@@ -189,7 +200,6 @@ def detectar_colisao():
 
             # Verifica se há combustível
             if matriz[pos_y][pos_x] == COMBUSTIVEL:
-                pontuacao += 10
                 combustivel = min(combustivel + 20, 100)  # Evita que o combustível ultrapasse 100
                 matriz[pos_y][pos_x] = RIO  # Limpa a posição do combustível
 
@@ -237,10 +247,10 @@ def tela_game_over(motivo):
 # Imprime a tela do jogo
 def delimitacao(matriz):
     margem_superior, margem_lateral = centralizar()
-
+    tempo_jogado = time.time() - inicio_tempo - tempo_pausado #calcula o tempo 
     print('\n' * (margem_superior - 1), end='')  # Ajusta a margem superior para subir a pontuação
     print(' ' * margem_lateral, end=' ')
-    print(f"\033[38;5;226mPontuação: {pontuacao} | Combustível: {combustivel:.1f}\033[0m".center(coluna + 8))
+    print(f"\033[38;5;226mPontuação: {pontuacao} | Combustível: {combustivel:.1f}| Tempo: {int(tempo_jogado)}s\033[0m".center(coluna + 8))
     print(' ' * margem_lateral, end=' ')
     print(" ")  # Linha separadora
 
@@ -254,7 +264,7 @@ def delimitacao(matriz):
 
 # Função para reiniciar o estado do jogo
 def reiniciar_jogo():
-    global pontuacao, combustivel, relogio, aviao_linha, aviao_coluna, matriz
+    global pontuacao, combustivel, relogio, aviao_linha, aviao_coluna, matriz, inicio_tempo
 
     # Reinicia as variáveis do jogo
     pontuacao = 0
@@ -266,13 +276,20 @@ def reiniciar_jogo():
     # Reinicia a matriz (preenchendo com o rio)
     matriz = [[RIO] * coluna for _ in range(linha)]
 
+    #reinicia o o cronometro 
+    inicio_tempo = time.time()
+
 # Inicialização da matriz
 for i in range(linha):
     matriz.append([RIO] * coluna)
 
 # Função que exibe o menu de pausa
 def tela_de_pause():
-    global pausado
+    global pausado, inicio_tempo, tempo_pausado
+
+    #Marca o inicio do tempo de pause 
+    inicio_tempo_pausa = time.time()
+    
     os.system('cls' if os.name == 'nt' else 'clear') # Limpa a tela
 
     pause = '''    
@@ -295,6 +312,11 @@ def tela_de_pause():
         if WConio2.kbhit():
             _, tecla = WConio2.getch()
             if tecla in ['1']:
+                pausado = False
+            
+                # Atualiza o tempo acumulado com o período de pausa
+                tempo_pausado += time.time() - inicio_tempo_pausa
+                inicio_tempo_pausa = None
                 return False
         
             elif tecla in ['2']:
@@ -332,10 +354,12 @@ def animacao_explosao():
 # Parte principal do programa
 # Função principal de jogo
 def jogar():
-    global nivel_dificuldade, pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
+    global nivel_dificuldade, pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna, inicio_tempo
     reiniciar_jogo()
     cursor.hide()
     nivel_dificuldade = 1
+     inicio_tempo = time.time()
+     inicio_tempo = time.time()
 
     while True:
         if pausado:
@@ -351,6 +375,9 @@ def jogar():
         adicionar_obstaculos(nivel_dificuldade)
 
         desenhar_aviao()
+        
+        #atualiza a pontuação com base no tempo
+        atualizar_pontuacao()
 
         delimitacao(matriz)
 
