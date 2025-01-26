@@ -28,6 +28,7 @@ combustivel = 100
 velocidade = 0.1 #velocidade inicial do jogo
 pontuacao = 0 
 pausado = False
+nivel_dificuldade = 1
 
 #arquivo que salva as pontuações
 arquivo_pontuacao = "pontuacao.json"
@@ -141,13 +142,27 @@ def mover_obstaculos():
                         matriz[i][j] = RIO
                         
 # Adiciona novos obstáculos e combustíveis na linha superior
-def adicionar_obstaculos():
-    num_objetos = random.randint(1, 1)  # Define o número de objetos a adicionar
+def adicionar_obstaculos(nivel_dificuldade):
+    num_objetos = random.randint(0, nivel_dificuldade)  # Define o número de objetos a adicionar
+    combustivel_na_tela = sum(1 for i in range(linha) for j in range(coluna) if matriz[i][j] == COMBUSTIVEL) #conta quantos combustíveis tem na tela
+    max_combustivel = 5  # Define o número máximo de combustíveis que podem aparecer na tela
+
     for _ in range(num_objetos):
-        tipo_objeto = random.choice([OBSTACULO, COMBUSTIVEL])
+        # Escolhe o tipo de objeto
+        if combustivel_na_tela < max_combustivel:
+            tipo_objeto = random.choice([OBSTACULO, COMBUSTIVEL])  # Combustível só aparece se estiver abaixo do limite
+        else:
+            tipo_objeto = OBSTACULO  #Caso contrário apenas obstáculos são gerados
+
+        # Escolhe aleatoriamente uma coluna da matriz onde o objeto vai ser colocado
         coluna_random = random.randint(0, coluna - 1)
         if matriz[0][coluna_random] == RIO:
             matriz[0][coluna_random] = tipo_objeto
+
+        # Atualiza a contagem de combustível na tela
+        if tipo_objeto == COMBUSTIVEL:
+            combustivel_na_tela += 1
+
                 
 #Detecta colisões
 def detectar_colisao():
@@ -317,10 +332,10 @@ def animacao_explosao():
 # Parte principal do programa
 # Função principal de jogo
 def jogar():
-    global pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
+    global nivel_dificuldade, pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna
     reiniciar_jogo()
     cursor.hide()
-    
+    nivel_dificuldade = 1
 
     while True:
         if pausado:
@@ -333,7 +348,7 @@ def jogar():
 
         limpar_posicao()
         mover_obstaculos()
-        adicionar_obstaculos()
+        adicionar_obstaculos(nivel_dificuldade)
 
         desenhar_aviao()
 
@@ -367,7 +382,7 @@ def jogar():
         relogio += 1
         if relogio % 100 == 0:
             velocidade = max(0.02, velocidade - 0.005)
-
+            nivel_dificuldade = min(nivel_dificuldade + 1, 5)#ajusta o limite máximo de dificuldade
         time.sleep(velocidade)
 
     cursor.show()
