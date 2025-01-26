@@ -18,8 +18,8 @@ COMBUSTIVEL = "\033[48;5;226m▲\033[0m"  # Combustível em amarelo
 #dimensões do mapa no jogo
 linha = 20
 coluna = 25
-aviao_linha = linha - 3 #Posição do avião linha
-aviao_coluna = coluna // 2  # Posição do avião coluna
+aviao_linha = 8 #Posição do avião linha
+aviao_coluna = 12  # Posição do avião coluna
 matriz = []
 
 #Variáveis do jogo
