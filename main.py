@@ -437,7 +437,7 @@ def exibir_capa():
                                                 ██╔══██╗██╔══██║██║██║  ██║
                                                 ██║  ██║██║  ██║██║██████╔╝
                                                 ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═════╝
-
+"""]
     #faz o efeito de digitação da frase
     frase = capa [0]
     for i in list(frase):
