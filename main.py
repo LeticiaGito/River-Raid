@@ -11,7 +11,7 @@ import re
 #configurações dos elementos de jogo
 VAZIO = " "  # Espaço vazio
 RIO = "\033[38;5;33m█\033[0m"  # Rio com a cor azul
-AVIAO = "\033[48;42;47m■\033[0m"  # Avião em branco e cinza
+AVIAO = "\033[38;5;16m\033[48;5;33m▲\033[0m"
 OBSTACULO = "\033[48;5;196m■\033[0m"  # Obstáculo em vermelho
 COMBUSTIVEL = "\033[48;5;226m▲\033[0m"  # Combustível em amarelo
 
