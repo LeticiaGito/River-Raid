@@ -352,7 +352,7 @@ def tela_de_pause():
                 centralizar_texto('Opção inválida! Digite [1] ou [2].', margem_superior= 8)
 
 def animacao_explosao():
-    exp
+    explosao
     explosao_frames = [
         ["   *   ", "  * *  ", "   *   "],  # Explosão inicial
         ["  * *  ", " *   * ", "  * *  "],  # Expansão da explosão
@@ -488,7 +488,7 @@ def exibir_capa():
             _, tecla = WConio2.getch()
             if tecla == '\r':  
                 Bip.play()
-                 break
+                break
 
 #menu
 def main_menu():
