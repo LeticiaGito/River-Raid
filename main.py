@@ -377,7 +377,6 @@ def animacao_explosao():
         time.sleep(0.2)  # Espera entre os quadros da animação
 
 # Parte principal do programa
-# Função principal de jogo
 def jogar():
     global nivel_dificuldade, pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna, inicio_tempo
     reiniciar_jogo()
@@ -572,7 +571,7 @@ def main_menu():
 \033[38;5;11m║                                                               ║\033[38;5;11m 
 \033[38;5;11m║  [D] Direita           _ .                                    ║\033[38;5;11m
 \033[38;5;11m║  [A] Esquerda        (  _ )_                   _              ║\033[38;5;11m
-\033[38;5;11m║  [W] Atirar         (_  _(_ ,)                (  )            ║\033[38;5;11m
+\033[38;5;11m║                     (_  _(_ ,)                (  )            ║\033[38;5;11m
 \033[38;5;11m║  [ESC] Pausar                              ( `  ) . )         ║\033[38;5;11m
 \033[38;5;11m║                                           (_, _(  ,_)_)       ║\033[38;5;11m
   \033[38;5;11m║                                                               ║\033[38;5;11m  
@@ -590,10 +589,10 @@ def main_menu():
                         break
 
         elif tecla == '4':  # Sair
-            Menu.stop()
-            Bip.play()
-            centralizar_texto("\033[37mSaindo do jogo. Até logo!\033[37m", margem_superior= 14)
-            break  # Encerra o loop principal e sai do programa
+            os.system('cls' if os.name == 'nt' else 'clear')  
+            centralizar_texto("Saindo do jogo. Até logo!", margem_superior= 0)
+            time.sleep(1)  
+            exit()
 
 #iniciar o menu
 if __name__ == "__main__":
