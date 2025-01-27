@@ -247,7 +247,7 @@ def tela_game_over(motivo):
         salvar_opcao = input("Deseja salvar sua pontuação? (s/n): ").strip().lower()
 
     if salvar_opcao == "s":
-        bip.play()
+        Bip.play()
         nome_jogador = input("\n                                          Digite seu nome: ")
         salvar_pontuacao(nome_jogador, pontuacao, tempo_final)
         print("\n                                          \033[38;5;40mPontuação salva com sucesso!\033[38;5;40m")
