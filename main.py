@@ -11,11 +11,11 @@ import pygame
 #Carrega os sons do jogo
 pygame.init()
  
-Musica = pygame.mixer.Sound("data/voando.mp3")
-explosao = pygame.mixer.Sound("data/explosao.wav") #Som de explosão do avião
-Bip = pygame.mixer.Sound("data/JogoPausado.wav")    #Som de seleção do menu
-Intro = pygame.mixer.Sound("data/Capa.wav") # Som da abertura do jogo
-Menu = pygame.mixer.Sound("data/Menu.mp3") # Musiquinha do Menu
+Musica = pygame.mixer.Sound("voando.mp3")
+explosao = pygame.mixer.Sound("explosao.wav") #Som de explosão do avião
+Bip = pygame.mixer.Sound("JogoPausado.wav")    #Som de seleção do menu
+Intro = pygame.mixer.Sound("Capa.wav") # Som da abertura do jogo
+Menu = pygame.mixer.Sound("Menu.mp3") # Musiquinha do Menu
 
 #configurações dos elementos de jogo
 VAZIO = " "  # Espaço vazio
