@@ -1,3 +1,7 @@
 [
-
+    {
+        "nome": "jogador 2",
+        "pontuacao": 20,
+        "tempo": 3
+    }
 ]
