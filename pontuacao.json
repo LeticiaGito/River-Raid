@@ -1,8 +1,12 @@
 [
     {
+        "nome": "ada",
+        "pontuacao": 40,
+        "tempo": 2
+    },
+    {
         "nome": "jogador 2",
         "pontuacao": 20,
         "tempo": 3
     }
-    
 ]
