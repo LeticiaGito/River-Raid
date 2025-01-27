@@ -6,7 +6,16 @@ import time
 import json
 import shutil
 import re
+import pygame
 
+#Carrega os sons do jogo
+pygame.init()
+ 
+Musica = pygame.mixer.Sound("data/voando.mp3")
+explosao = pygame.mixer.Sound("data/explosao.wav") #Som de explosão do avião
+Bip = pygame.mixer.Sound("data/JogoPausado.wav")    #Som de seleção do menu
+Intro = pygame.mixer.Sound("data/Capa.wav") # Som da abertura do jogo
+Menu = pygame.mixer.Sound("data/Menu.mp3") # Musiquinha do Menu
 
 #configurações dos elementos de jogo
 VAZIO = " "  # Espaço vazio
@@ -238,6 +247,7 @@ def tela_game_over(motivo):
         salvar_opcao = input("Deseja salvar sua pontuação? (s/n): ").strip().lower()
 
     if salvar_opcao == "s":
+        bip.play()
         nome_jogador = input("\n                                          Digite seu nome: ")
         salvar_pontuacao(nome_jogador, pontuacao, tempo_final)
         print("\n                                          \033[38;5;40mPontuação salva com sucesso!\033[38;5;40m")
@@ -250,6 +260,7 @@ def tela_game_over(motivo):
         if WConio2.kbhit():
             _, tecla = WConio2.getch()
             if tecla == '\r':  # Verifica se a tecla pressionada é "Enter"
+                Bip.play()
                 main_menu()  # Sai do loop e retorna ao menu
  
 # Imprime a tela do jogo
@@ -301,6 +312,9 @@ def tela_de_pause():
     
     os.system('cls' if os.name == 'nt' else 'clear') # Limpa a tela
 
+    Musica.stop()
+    Bip.play()
+    
     pause = '''    
 \033[38;5;11m╔═══════════════════════════╗\033[0m
 \033[38;5;11m║                           ║\033[0m
@@ -321,6 +335,7 @@ def tela_de_pause():
         if WConio2.kbhit():
             _, tecla = WConio2.getch()
             if tecla in ['1']:
+                Bip.play()
                 pausado = False
 
                 # Atualiza o tempo acumulado com o período de pausa
@@ -329,12 +344,15 @@ def tela_de_pause():
                 return False
         
             elif tecla in ['2']:
+                Bip.play()
                 return True
         
             else: 
+                Bip.play()
                 centralizar_texto('Opção inválida! Digite [1] ou [2].', margem_superior= 8)
 
 def animacao_explosao():
+    exp
     explosao_frames = [
         ["   *   ", "  * *  ", "   *   "],  # Explosão inicial
         ["  * *  ", " *   * ", "  * *  "],  # Expansão da explosão
@@ -363,6 +381,8 @@ def animacao_explosao():
 def jogar():
     global nivel_dificuldade, pausado, combustivel, pontuacao, velocidade, relogio, aviao_coluna, inicio_tempo
     reiniciar_jogo()
+    Menu.stop()
+    Musica.play()
     cursor.hide()
     nivel_dificuldade = 1
     inicio_tempo = time.time()
@@ -373,8 +393,10 @@ def jogar():
     while True:
         if pausado:
             if tela_de_pause():
+                Musica.stop()
                 break
             pausado = False
+            Musica.play()
             continue
 
         WConio2.gotoxy(0, 0)  # Posiciona o cursor no canto superior esquerdo
@@ -392,12 +414,16 @@ def jogar():
 
         colidiu, motivo = detectar_colisao()
         if colidiu:
+            Musica.stop()
+            explosao.play()
             animacao_explosao()  # Exibe a animação da explosão
             tela_game_over(motivo)  # Exibe a tela de "Game Over" com o motivo
             break  # Encerra o loop ou reinicia o jogo
 
         combustivel -= 0.5
         if combustivel <= 0:
+            Musica.stop()
+            explosao.play()
             animacao_explosao()
             tela_game_over("O seu combustível acabou!")
             break
@@ -426,6 +452,9 @@ def jogar():
     return pontuacao
 
 def exibir_capa():
+
+    Intro.play()
+    
     capa = ["""
 
 
@@ -458,10 +487,13 @@ def exibir_capa():
         if WConio2.kbhit():
             _, tecla = WConio2.getch()
             if tecla == '\r':  
+                Bip.play()
                  break
 
 #menu
 def main_menu():
+
+    Menu.play()
     
     while True:
         # Exibe o menu apenas uma vez
@@ -496,6 +528,8 @@ def main_menu():
                 _, tecla = WConio2.getch()
 
         if tecla == '1':  # Jogar
+            Menu.stop()
+            Bip.play()
             pontuacao_final = jogar()
             # pontu = print(f"Sua pontuação final foi: {pontuacao_final}")
             # salvar_opcao = input("Deseja salvar sua pontuação? (s/n): ").strip().lower()
@@ -504,6 +538,8 @@ def main_menu():
 
 
         elif tecla == '2':  # Highscores
+            Menu.stop()
+            Bip.play()
             os.system('cls' if os.name == 'nt' else 'clear')
             exibir_pontuacoes()
 
@@ -513,9 +549,13 @@ def main_menu():
                 if WConio2.kbhit():
                     _, tecla = WConio2.getch()
                     if tecla == '\r':  
+                        Menu.play()
+                        Bip.play()
                         break
 
         elif tecla == '3':
+            Menu.stop()
+            Bip.play()
             os.system('cls')
             instrucoes = '''            
 \033[38;5;11m╔═══════════════════════════════════════════════════════════════╗\033[38;5;11m
@@ -544,10 +584,14 @@ def main_menu():
             while True:
                 if WConio2.kbhit():
                     _, tecla = WConio2.getch()
-                    if tecla == '\r':  
+                    if tecla == '\r': 
+                        Menu.play()
+                        Bip.play()
                         break
 
         elif tecla == '4':  # Sair
+            Menu.stop()
+            Bip.play()
             centralizar_texto("\033[37mSaindo do jogo. Até logo!\033[37m", margem_superior= 14)
             break  # Encerra o loop principal e sai do programa
 
